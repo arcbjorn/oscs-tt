@@ -6,6 +6,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     name: 'Home',
     component: Home,
+    meta: {
+      requiresAdmin: true,
+    },
   },
   {
     path: '/about',
@@ -20,6 +23,14 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach(async (to, from, next) => {
+  const isAdmin = true;
+  const requiresAdmin = to.matched.some((record) => record.meta.requiresAdmin);
+
+  if (requiresAdmin && !isAdmin) next({ name: 'Home' });
+  else next();
 });
 
 export default router;

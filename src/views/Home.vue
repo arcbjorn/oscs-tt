@@ -5,7 +5,7 @@ div.flex.justify-center
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue';
+import HelloWorld from '@/components/Header.vue';
 
 export default defineComponent({
   name: 'Home',
