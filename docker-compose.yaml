@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  client:
+    build:
+      context: './client'
+      target: 'develop-stage'
+    ports:
+      - '8080:8080'
+    volumes:
+      - './client/src:/app/src'
+      - './client/public:/app/public'
+      - './client/tests:/app/tests'
+    command: '/bin/sh -c "npm start"'
