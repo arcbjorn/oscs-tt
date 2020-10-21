@@ -1,5 +1,5 @@
 <template lang="pug">
-div#app
+.container.mx-auto#app
   router-link(to="/") Home |
   router-link(to="/about")  About
 router-view(v-slot="slotProps")
@@ -11,7 +11,6 @@ router-view(v-slot="slotProps")
 #app
   -webkit-font-smoothing antialiased
   -moz-osx-font-smoothing grayscale
-  text-align center
   color #2c3e50
   margin-top 60px
 

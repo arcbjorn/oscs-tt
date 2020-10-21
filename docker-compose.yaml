@@ -11,4 +11,4 @@ services:
       - './client/src:/app/src'
       - './client/public:/app/public'
       - './client/tests:/app/tests'
-    command: '/bin/sh -c "npm start"'
+    command: '/bin/sh -c "yarn start"'
