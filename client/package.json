@@ -1,6 +1,7 @@
 {
-  "name": "oscs-tt",
+  "name": "oscs-tt-client",
   "version": "0.1.0",
+  "author": "Oleg Luganskiy"
   "private": true,
   "scripts": {
     "start": "vue-cli-service serve",
