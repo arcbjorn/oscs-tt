@@ -1,5 +1,8 @@
 version: '3.8'
 
+volumes:
+  oscs_tt-postgres:
+
 services:
   postgres:
     image: 'postgres:alpine'

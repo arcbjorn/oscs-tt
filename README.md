@@ -27,6 +27,20 @@ $ docker-compose logs <service_name>
 
 ## Docker
 
+Build, run and stop Server (back-end) service:
+
+```bash
+# Build docker image:
+$ cd server
+$ docker build --tag oscs-tt-server .
+
+# Run container:
+$ docker run --name oscs-tt-server --env-file .env --network="host" oscs-tt-server
+
+# Stop and remove container:
+$ docker rm --force oscs-tt-server
+```
+
 Build, run and stop Client service:
 
 ```bash
@@ -39,6 +53,29 @@ $ docker run --name oscs-tt-client --env-file .env --network="host" oscs-tt-clie
 
 # Stop and remove container:
 $ docker rm --force oscs-tt-client
+```
+
+## Development
+
+Setup development environment:
+
+```sh
+cd oscs-tt/server
+# Docker-compose will install dependencies inside the container,
+# but this step is required if you want to have graphql type generation,
+# dev scripts and reach IDE features to work.
+yarn
+cp .env.sample .env
+cd oscs-tt/server
+yarn
+cp .env.sample .env
+```
+
+Next check configuration at .env files and run the following commands:
+
+```sh
+cd oscs-tt
+docker-compose up
 ```
 
 ### Generate custom Icon font from svg icons
