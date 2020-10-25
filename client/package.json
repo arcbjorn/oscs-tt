@@ -1,13 +1,15 @@
 {
   "name": "oscs-tt-client",
   "version": "0.1.0",
-  "author": "Oleg Luganskiy"
+  "author": "Oleg Luganskiy",
   "private": true,
   "scripts": {
     "start": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "clean": "git clean -dfqX -- ./node_modules ./dist",
+    "docker:sh": "docker-compose exec client /bin/sh"
   },
   "dependencies": {
     "core-js": "^3.6.5",
