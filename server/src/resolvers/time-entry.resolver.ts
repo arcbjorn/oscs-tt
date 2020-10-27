@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
 import {
   Resolver,
   Query,
@@ -13,31 +15,31 @@ import { createTimeEntrySamples } from '../time-entry.samples';
 export class TimeEntryResolver {
   private readonly items: TimeEntry[] = createTimeEntrySamples();
 
-  // @Query({ nullable: true })
-  // async timeEntry(@Args() { title }: TimeEntriesArgs): Promise<TimeEntry> {
-  //   const entry = await this.items.find((timeEntry) => timeEntry.title === title);
-  //   if (entry === undefined) {
-  //     throw new Error();
-  //   }
-  //   return entry as TimeEntry;
-  // }
+  @Query(() => TimeEntry, { nullable: true })
+  async timeEntry(@Args() { title }: TimeEntriesArgs): Promise<TimeEntry> {
+    const entry = await this.items.find((timeEntry) => timeEntry.title === title);
+    if (entry === undefined) {
+      throw new Error();
+    }
+    return entry;
+  }
 
-  // @Query({ description: 'Get all the TimeEntries' })
-  // async timeEntries() {
-  //   const items = await this.items;
-  //   return items;
-  // }
+  @Query(() => [TimeEntry], { description: 'Get all the TimeEntries' })
+  async timeEntries() {
+    const items = await this.items;
+    return items;
+  }
 
-  // @Mutation()
-  // async addTimeEntry(@Arg('dto') dto: TimeEntryDto) {
-  //   const timeEntry = Object.assign(new TimeEntry(), {
-  //     description: dto.description,
-  //     title: dto.title,
-  //     creationDate: new Date(),
-  //   });
-  //   await this.items.push(timeEntry);
-  //   return timeEntry as TimeEntry;
-  // }
+  @Mutation(() => [TimeEntry])
+  async addTimeEntry(@Arg('dto') dto: TimeEntryDto) {
+    const timeEntry = Object.assign(new TimeEntry(), {
+      description: dto.description,
+      title: dto.title,
+      creationDate: new Date(),
+    });
+    await this.items.push(timeEntry);
+    return timeEntry;
+  }
 
   // @FieldResolver()
   // ratingsCount(

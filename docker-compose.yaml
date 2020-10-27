@@ -20,8 +20,8 @@ services:
       target: 'develop-stage'
     depends_on:
       - 'postgres'
-    # env_file:
-    #   - ./server/.env
+    env_file:
+      - ./server/.env
     ports:
       - '8081:8081'
     volumes:
