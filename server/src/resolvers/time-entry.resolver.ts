@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
 import {
   Resolver,
   Query,
@@ -16,7 +14,7 @@ export class TimeEntryResolver {
   private readonly items: TimeEntry[] = createTimeEntrySamples();
 
   @Query(() => TimeEntry, { nullable: true })
-  async timeEntry(@Args() { title }: TimeEntriesArgs): Promise<TimeEntry> {
+  async getTimeEntry(@Args() { title }: TimeEntriesArgs) {
     const entry = await this.items.find((timeEntry) => timeEntry.title === title);
     if (entry === undefined) {
       throw new Error();
@@ -25,7 +23,7 @@ export class TimeEntryResolver {
   }
 
   @Query(() => [TimeEntry], { description: 'Get all the TimeEntries' })
-  async timeEntries() {
+  async getAllTimeEntries() {
     const items = await this.items;
     return items;
   }

@@ -4,19 +4,34 @@ import {
   ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
+import { BaseDataArgs } from './BaseDataArgs';
+import { Course } from './Course';
+import { Specialty } from './Specialty';
 
-@ObjectType({ description: 'Object representing time entry' })
+@ObjectType({ description: 'Time entry of the user' })
 export class TimeEntry extends Model {
   static tableName = 'timeEntries';
 
-  @Field()
+  @Field({ description: 'Owner' })
+  owner!: User;
+
+  @Field({ description: 'Title' })
   title!: string;
 
-  @Field({ nullable: false, description: 'The time entry description' })
+  @Field({ nullable: false, description: 'Description' })
   description?: string;
 
+  @Field({ description: 'Specific area of academic Sub-topic' })
+  specialty?: Specialty;
+
+  @Field({ description: 'Optional educational Course' })
+  course?: Course;
+
   @Field()
-  creationDate!: Date;
+  startDate!: Date;
+
+  @Field()
+  endDate!: Date;
 
   // @Field((type) => Float, { nullable: true })
   // get averageRating(): number | null {
@@ -29,6 +44,7 @@ export class TimeEntry extends Model {
   // }
 }
 
+// For creating/updating TimeEntryDto
 @InputType()
 export class TimeEntryDto implements Partial<TimeEntry> {
   @Field({ nullable: true })
@@ -36,13 +52,17 @@ export class TimeEntryDto implements Partial<TimeEntry> {
 
   @Field({ nullable: true })
   description?: string;
-}
-
-@ArgsType()
-export class TimeEntriesArgs {
-  @Field()
-  id?: number;
 
   @Field({ nullable: true })
-  title?: string;
+  ownerId?: number;
+
+  @Field({ nullable: true })
+  specialtyId?: number;
+}
+
+// For fetching the TimeEntry data
+@ArgsType()
+export class TimeEntriesArgs extends BaseDataArgs {
+  @Field({ nullable: true })
+  specialtyId?: number;
 }
