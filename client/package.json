@@ -9,16 +9,22 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "clean": "git clean -dfqX -- ./node_modules ./dist",
+    "types:generate": "graphql-codegen --config codegen.yaml",
     "docker:sh": "docker-compose exec client /bin/sh"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "graphql": "^15.4.0",
     "tailwindcss": "^1.9.5",
     "vue": "^3.0.0-0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.15.1",
+    "@graphql-codegen/typescript": "^1.15.1",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.15.1",
+    "@graphql-codegen/typescript-operations": "^1.15.1",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",

@@ -15,9 +15,13 @@
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet",
     "clean": "git clean -dfqX -- ./node_modules ./dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "docker:sh": "docker-compose exec server /bin/sh"
+    "migrate": "docker-compose exec api yarn knex migrate:latest --knexfile ./src/db/knexfile.ts",
+    "migrate:down": "docker-compose exec api yarn knex migrate:down --knexfile ./src/db/knexfile.ts",
+    "migrate:rollback": "docker-compose exec api yarn knex migrate:rollback --all --knexfile ./src/db/knexfile.ts",
+    "migrate:make": "docker-compose exec api yarn knex migrate:make --knexfile ./src/db/knexfile.ts",
+    "seed": "docker-compose exec api yarn knex seed:run --knexfile ./src/db/knexfile.ts",
+    "docker:sh": "sudo docker-compose exec server /bin/sh"
   },
-
   "dependencies": {
     "apollo-server": "^2.18.2",
     "bcrypt": "^5.0.0",
