@@ -1,30 +1,20 @@
 /* eslint-disable max-classes-per-file */
-import { Model } from 'objection';
 import {
   ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
-import { BaseDataArgs } from './BaseDataArgs';
+import { BaseModel, BaseDto, BaseDataArgs } from './Base';
 import { Course } from './Course';
 import { Specialty } from './Specialty';
 
 @ObjectType({ description: 'Time entry of the user' })
-export class TimeEntry extends Model {
+export class TimeEntry extends BaseModel {
   static tableName = 'timeEntries';
 
-  @Field({ description: 'Owner' })
-  owner!: User;
-
-  @Field({ description: 'Title' })
-  title!: string;
-
-  @Field({ nullable: false, description: 'Description' })
-  description?: string;
-
-  @Field({ description: 'Specific area of academic Sub-topic' })
+  @Field(() => Specialty, { description: 'Specific area of academic Sub-topic' })
   specialty?: Specialty;
 
-  @Field({ description: 'Optional educational Course' })
+  @Field(() => Course, { description: 'Optional educational Course' })
   course?: Course;
 
   @Field()
@@ -46,23 +36,14 @@ export class TimeEntry extends Model {
 
 // For creating/updating TimeEntryDto
 @InputType()
-export class TimeEntryDto implements Partial<TimeEntry> {
-  @Field({ nullable: true })
-  title?: string;
-
-  @Field({ nullable: true })
-  description?: string;
-
-  @Field({ nullable: true })
-  ownerId?: number;
-
+export class TimeEntryDto extends BaseDto implements Partial<TimeEntry> {
   @Field({ nullable: true })
   specialtyId?: number;
 }
 
 // For fetching the TimeEntry data
 @ArgsType()
-export class TimeEntriesArgs extends BaseDataArgs {
+export class TimeEntryArgs extends BaseDataArgs {
   @Field({ nullable: true })
   specialtyId?: number;
 }

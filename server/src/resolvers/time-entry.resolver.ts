@@ -6,15 +6,15 @@ import {
   Arg,
 } from 'type-graphql';
 
-import { TimeEntry, TimeEntriesArgs, TimeEntryDto } from '../db';
-import { createTimeEntrySamples } from '../time-entry.samples';
+import { TimeEntry, TimeEntryArgs, TimeEntryDto } from '../db';
+import { createTimeEntrySamples } from '../samples';
 
 @Resolver(TimeEntry)
 export class TimeEntryResolver {
   private readonly items: TimeEntry[] = createTimeEntrySamples();
 
   @Query(() => TimeEntry, { nullable: true })
-  async getTimeEntry(@Args() { title }: TimeEntriesArgs) {
+  async getTimeEntry(@Args() { title }: TimeEntryArgs) {
     const entry = await this.items.find((timeEntry) => timeEntry.title === title);
     if (entry === undefined) {
       throw new Error();

@@ -1,41 +1,26 @@
 /* eslint-disable max-classes-per-file */
-import { Model } from 'objection';
 import {
   ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
-import { BaseDataArgs } from './BaseDataArgs';
+import { BaseDataArgs, BaseDto, BaseModel } from './Base';
 import { Specialty } from './Specialty';
+import { Topic } from './Topic';
 
 @ObjectType({ description: 'Academic Sub-topic' })
-export class Subtopic extends Model {
+export class Subtopic extends BaseModel {
   static tableName = 'subtopics';
 
-  @Field({ description: 'Title of the subtopic' })
-  title!: string;
-
-  @Field({ nullable: false, description: 'Description' })
-  description?: string;
-
-  @Field({ description: 'Part of academic topic' })
+  @Field(() => Topic, { description: 'One of the main fields of knowledge' })
   topic?: Topic;
 
-  @Field({ description: 'Part of academic topic' })
+  @Field(() => [Specialty], { description: 'Components' })
   specialties?: Specialty[];
 }
 
 // For creating/updating Subtopic
 @InputType()
-export class SubtopicDto implements Partial<Subtopic> {
-  @Field({ nullable: true })
-  title?: string;
-
-  @Field({ nullable: true })
-  description?: string;
-
-  @Field({ nullable: true })
-  ownerId?: string;
-
+export class SubtopicDto extends BaseDto implements Partial<Subtopic> {
   @Field({ nullable: true })
   topicId?: number;
 }

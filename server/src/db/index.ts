@@ -4,6 +4,7 @@ import { Model } from 'objection';
 import dbconfig from './knexfile';
 
 export * from './models/TimeEntry';
+export * from './models/Topic';
 export const knex = Knex(dbconfig.development);
 
 Model.knex(knex);
