@@ -18,7 +18,7 @@ export class Topic extends BaseModel {
 @InputType()
 export class TopicDto extends BaseDto implements Partial<Topic> {
   @Field({ nullable: true })
-  title?: string;
+  name?: string;
 }
 
 // For fetching the Topic data

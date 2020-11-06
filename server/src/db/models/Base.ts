@@ -1,11 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
 import { Model } from 'objection';
-import { Field } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 import { User } from './User';
 
+@ObjectType()
 export class BaseModel extends Model {
   @Field()
-  title!: string;
+  name!: string;
 
   @Field(() => User, { description: 'Owner' })
   owner!: User;
@@ -16,7 +17,7 @@ export class BaseModel extends Model {
 
 export class BaseDto {
   @Field({ nullable: true })
-  title?: string;
+  name?: string;
 
   @Field({ nullable: true })
   description?: string;
@@ -30,7 +31,7 @@ export class BaseDataArgs {
   id?: number;
 
   @Field()
-  title?: string;
+  name?: string;
 
   @Field({ nullable: true })
   ownerId?: number;

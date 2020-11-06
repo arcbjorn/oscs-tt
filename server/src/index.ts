@@ -4,13 +4,25 @@ import 'reflect-metadata';
 import { resolve } from 'path';
 import { ApolloServer } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
-import { TimeEntryResolver, TopicResolver } from './resolvers';
+import {
+  TimeEntryResolver,
+  CourseResolver,
+  SpecialtyResolver,
+  SubtopicResolver,
+  TopicResolver,
+} from './resolvers';
 
 dotenv.config();
 
 (async () => {
   const schema = await buildSchema({
-    resolvers: [TimeEntryResolver, TopicResolver],
+    resolvers: [
+      TimeEntryResolver,
+      CourseResolver,
+      SpecialtyResolver,
+      SubtopicResolver,
+      TopicResolver,
+    ],
     emitSchemaFile: resolve(__dirname, 'schema.gql'),
   });
 

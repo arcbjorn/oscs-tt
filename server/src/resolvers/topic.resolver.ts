@@ -14,8 +14,8 @@ export class TopicResolver {
   private readonly topics: Topic[] = createTopicSamples();
 
   @Query(() => Topic, { nullable: true })
-  async getTopic(@Args() { title }: TopicArgs) {
-    const entry = await this.topics.find((topic) => topic.title === title);
+  async getTopic(@Args() { name }: TopicArgs) {
+    const entry = await this.topics.find((topic) => topic.name === name);
     if (entry === undefined) {
       throw new Error();
     }
@@ -32,10 +32,10 @@ export class TopicResolver {
   }
 
   @Mutation(() => [Topic])
-  async addTopic(@Arg('dto') dto: TopicDto) {
+  async createTopic(@Arg('dto') dto: TopicDto) {
     const topic = Object.assign(new Topic(), {
       description: dto.description,
-      title: dto.title,
+      name: dto.name,
     });
     await this.topics.push(topic);
     if (topic === undefined) {

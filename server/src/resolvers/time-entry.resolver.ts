@@ -14,25 +14,25 @@ export class TimeEntryResolver {
   private readonly items: TimeEntry[] = createTimeEntrySamples();
 
   @Query(() => TimeEntry, { nullable: true })
-  async getTimeEntry(@Args() { title }: TimeEntryArgs) {
-    const entry = await this.items.find((timeEntry) => timeEntry.title === title);
+  async timeEntry(@Args() { name }: TimeEntryArgs) {
+    const entry = await this.items.find((timeEntry) => timeEntry.name === name);
     if (entry === undefined) {
       throw new Error();
     }
     return entry;
   }
 
-  @Query(() => [TimeEntry], { description: 'Get all the TimeEntries' })
-  async getAllTimeEntries() {
+  @Query(() => [TimeEntry])
+  async timeEntries() {
     const items = await this.items;
     return items;
   }
 
   @Mutation(() => [TimeEntry])
-  async addTimeEntry(@Arg('dto') dto: TimeEntryDto) {
+  async createTimeEntry(@Arg('dto') dto: TimeEntryDto) {
     const timeEntry = Object.assign(new TimeEntry(), {
       description: dto.description,
-      title: dto.title,
+      name: dto.name,
       creationDate: new Date(),
     });
     await this.items.push(timeEntry);

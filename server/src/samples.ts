@@ -1,7 +1,11 @@
-import { TimeEntry, Topic } from './db';
+import { TimeEntry, Course, Topic } from './db';
 
 function createTimeEntry(timeEntryData: Partial<TimeEntry>) {
   return Object.assign(new TimeEntry(), timeEntryData);
+}
+
+function createCourse(courseData: Partial<Course>) {
+  return Object.assign(new Course(), courseData);
 }
 
 function createTopic(timeEntryData: Partial<Topic>) {
@@ -12,21 +16,38 @@ export function createTimeEntrySamples() {
   return [
     createTimeEntry({
       description: 'Desc 1',
-      title: 'TimeEntry 1',
+      name: 'TimeEntry 1',
       startDate: new Date('2018-04-11'),
       endDate: new Date('2018-04-11'),
     }),
     createTimeEntry({
       description: 'Desc 2',
-      title: 'TimeEntry 2',
+      name: 'TimeEntry 2',
       startDate: new Date('2018-04-11'),
       endDate: new Date('2018-04-11'),
     }),
     createTimeEntry({
       description: 'Desc 3',
-      title: 'TimeEntry 3',
+      name: 'TimeEntry 3',
       startDate: new Date('2018-04-11'),
       endDate: new Date('2018-04-11'),
+    }),
+  ];
+}
+
+export function createCourseSamples() {
+  return [
+    createCourse({
+      name: 'Course 1',
+      description: 'Course Desc 1',
+    }),
+    createCourse({
+      name: 'Course 2',
+      description: 'Course Desc 2',
+    }),
+    createCourse({
+      name: 'Course 3',
+      description: 'Course Desc 3',
     }),
   ];
 }
@@ -34,15 +55,15 @@ export function createTimeEntrySamples() {
 export function createTopicSamples() {
   return [
     createTopic({
-      title: 'Topic 1',
+      name: 'Topic 1',
       description: 'Topic Desc 1',
     }),
     createTopic({
-      title: 'Topic 2',
+      name: 'Topic 2',
       description: 'Topic Desc 2',
     }),
     createTopic({
-      title: 'Topic 3',
+      name: 'Topic 3',
       description: 'Topic Desc 3',
     }),
   ];
