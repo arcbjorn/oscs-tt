@@ -14,7 +14,7 @@ export class Specialty extends BaseModel {
   @Field(() => Subtopic, { description: 'Part of academic Topic' })
   subtopic?: Subtopic;
 
-  @Field(() => TimeEntry, { description: 'Periods of time spent on this specialty' })
+  @Field(() => TimeEntry, { description: 'Periods of time spent on this Specialty' })
   timeEntries?: TimeEntry[];
 }
 

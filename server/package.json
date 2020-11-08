@@ -15,11 +15,11 @@
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet",
     "clean": "git clean -dfqX -- ./node_modules ./dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "docker-compose exec api yarn knex migrate:latest --knexfile ./src/db/knexfile.ts",
-    "migrate:down": "docker-compose exec api yarn knex migrate:down --knexfile ./src/db/knexfile.ts",
-    "migrate:rollback": "docker-compose exec api yarn knex migrate:rollback --all --knexfile ./src/db/knexfile.ts",
-    "migrate:make": "docker-compose exec api yarn knex migrate:make --knexfile ./src/db/knexfile.ts",
-    "seed": "docker-compose exec api yarn knex seed:run --knexfile ./src/db/knexfile.ts",
+    "migrate": "docker-compose exec server yarn knex migrate:latest --knexfile ./src/db/knexfile.ts",
+    "migrate:down": "docker-compose exec server yarn knex migrate:down --knexfile ./src/db/knexfile.ts",
+    "migrate:rollback": "docker-compose exec server yarn knex migrate:rollback --all --knexfile ./src/db/knexfile.ts",
+    "migrate:make": "docker-compose exec server yarn knex migrate:make --knexfile ./src/db/knexfile.ts",
+    "seed": "docker-compose exec server yarn knex seed:run --knexfile ./src/db/knexfile.ts",
     "docker:sh": "sudo docker-compose exec server /bin/sh"
   },
   "dependencies": {
