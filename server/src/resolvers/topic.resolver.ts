@@ -14,7 +14,7 @@ export class TopicResolver {
   private readonly topics: Topic[] = createTopicSamples();
 
   @Query(() => Topic, { nullable: true })
-  async getTopic(@Args() { name }: TopicArgs) {
+  async getTopic(@Args() { name }: TopicArgs): Promise<Topic> {
     const entry = await this.topics.find((topic) => topic.name === name);
     if (entry === undefined) {
       throw new Error();
@@ -23,7 +23,7 @@ export class TopicResolver {
   }
 
   @Query(() => [Topic])
-  async getTopics() {
+  async getTopics(): Promise<Topic[]> {
     const topics = await this.topics;
     if (topics === undefined) {
       throw new Error();
@@ -32,7 +32,7 @@ export class TopicResolver {
   }
 
   @Mutation(() => [Topic])
-  async createTopic(@Arg('dto') dto: TopicDto) {
+  async createTopic(@Arg('dto') dto: TopicDto): Promise<Number> {
     const topic = Object.assign(new Topic(), {
       description: dto.description,
       name: dto.name,
@@ -41,6 +41,6 @@ export class TopicResolver {
     if (topic === undefined) {
       throw new Error();
     }
-    return topic;
+    return topic.id;
   }
 }

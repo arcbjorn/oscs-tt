@@ -6,6 +6,9 @@ import { User } from './User';
 @ObjectType()
 export class BaseModel extends Model {
   @Field()
+  id!: number;
+
+  @Field()
   name!: string;
 
   @Field(() => User, { description: 'Owner' })
