@@ -1,10 +1,9 @@
 import { Model } from 'objection';
 import {
-  ArgsType,
-  Field, InputType, ObjectType,
+  Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseModel, BaseDto, BaseDataArgs } from './Base';
+import { BaseModel, BaseDto } from './Base';
 import { Subtopic } from './Subtopic';
 import { User } from './User';
 
@@ -48,7 +47,7 @@ export class Topic extends BaseModel {
     },
   });
 
-  public static async create(dto: TopicDto): Promise<number> {
+  public static async create(dto: BaseDto): Promise<number> {
     try {
       const topic = await Topic.query().insert({ ...dto });
 
@@ -83,11 +82,11 @@ export class Topic extends BaseModel {
 
       return topics;
     } catch (error: unknown) {
-      throw objectionError(error, 'topic.getAll');
+      throw objectionError(error, 'topic.all');
     }
   }
 
-  public static async update(id: number, dto: TopicDto): Promise<boolean> {
+  public static async update(id: number, dto: BaseDto): Promise<boolean> {
     try {
       await Topic.query().findById(id).patch({ ...dto });
 
@@ -109,15 +108,12 @@ export class Topic extends BaseModel {
 }
 
 // For creating/updating Topic
-@InputType()
-export class TopicDto extends BaseDto implements Partial<Topic> {
-  @Field({ nullable: true })
-  department?: string;
-}
+// @InputType()
+// export class TopicDto extends BaseDto implements Partial<Topic> {
+//   @Field({ nullable: true })
+//   department?: string;
+// }
 
 // For fetching the Topic data
-@ArgsType()
-export class TopicArgs extends BaseDataArgs {
-  @Field({ nullable: true })
-  topicId?: number;
-}
+// @ArgsType()
+// export class TopicArgs extends BaseDataArgs {}

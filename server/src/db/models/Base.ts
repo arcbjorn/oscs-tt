@@ -33,9 +33,6 @@ export class BaseDataArgs {
   @Field()
   id?: number;
 
-  @Field()
-  name?: string;
-
   @Field({ nullable: true })
   ownerId?: number;
 }
