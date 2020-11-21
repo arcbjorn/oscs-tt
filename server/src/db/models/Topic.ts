@@ -1,9 +1,9 @@
-import { ValidationError, Model } from 'objection';
-
+import { Model } from 'objection';
 import {
   ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
+import { objectionError } from '../utils/error.handler';
 import { BaseModel, BaseDto, BaseDataArgs } from './Base';
 import { Subtopic } from './Subtopic';
 import { User } from './User';
@@ -48,57 +48,62 @@ export class Topic extends BaseModel {
     },
   });
 
-  public static async create(dto: TopicDto) {
+  public static async create(dto: TopicDto): Promise<number> {
     try {
       const topic = await Topic.query().insert({ ...dto });
 
       return topic.id;
-    } catch (e: unknown) {
-      if (e instanceof ValidationError) {
-        throw new ValidationError({
-          statusCode: e.statusCode,
-          message: 'topics.create',
-          data: e.data,
-          type: e.type,
-        });
-      }
-      throw new Error('topics.create');
+    } catch (error: unknown) {
+      throw objectionError(error, 'topic.create');
     }
   }
 
-  public static async update(id: number, dto: TopicDto) {
+  public static async get(id: number): Promise<Topic> {
+    try {
+      const topic = Topic
+        .query()
+        .findById(id)
+        .withGraphFetched({
+          subtopics: true,
+        });
+
+      return topic;
+    } catch (error: unknown) {
+      throw objectionError(error, 'topic.get');
+    }
+  }
+
+  public static async getAll(): Promise<Topic[]> {
+    try {
+      const topics = Topic
+        .query()
+        .withGraphFetched({
+          subtopics: true,
+        });
+
+      return topics;
+    } catch (error: unknown) {
+      throw objectionError(error, 'topic.getAll');
+    }
+  }
+
+  public static async update(id: number, dto: TopicDto): Promise<boolean> {
     try {
       await Topic.query().findById(id).patch({ ...dto });
 
       return true;
-    } catch (e: unknown) {
-      if (e instanceof ValidationError) {
-        throw new ValidationError({
-          statusCode: e.statusCode,
-          message: 'topics.update',
-          data: e.data,
-          type: e.type,
-        });
-      }
-      throw new Error('topics.update');
+    } catch (error: unknown) {
+      throw objectionError(error, 'topic.update');
     }
   }
 
-  public static async delete(id: number) {
+  public static async delete(id: number): Promise<boolean> {
     try {
       await Topic.query().deleteById(id);
 
       return true;
-    } catch (e: unknown) {
-      if (e instanceof ValidationError) {
-        throw new ValidationError({
-          statusCode: e.statusCode,
-          message: 'topics.delete',
-          data: e.data,
-          type: e.type,
-        });
-      }
-      throw new Error('topics.delete');
+    } catch (error: unknown) {
+      throw objectionError(error, 'topic.delete');
     }
   }
 }
