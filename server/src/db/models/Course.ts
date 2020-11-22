@@ -1,7 +1,8 @@
 /* eslint-disable no-shadow */
 import { Model, QueryBuilder } from 'objection';
 import {
-  Field, InputType, ObjectType,
+  ArgsType,
+  Field, InputType, ObjectType, registerEnumType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
 import { BaseModel, BaseDto, BaseDataArgs } from './Base';
@@ -15,6 +16,10 @@ export enum CourseSource {
   SUBTOPIC,
   SPECIALTY,
 }
+
+registerEnumType(CourseSource, {
+  name: 'CourseSource',
+});
 
 @ObjectType({ description: 'Educational Course' })
 export class Course extends BaseModel {
@@ -79,8 +84,12 @@ export class Course extends BaseModel {
     };
   }
 
-  public static async create(sourceId: number, dto: CourseDto, args: BaseDataArgs): Promise<number> {
+  public static async create(dto: CourseDto, args: CourseArgs): Promise<number> {
     try {
+      if (typeof args.sourceId === 'undefined') {
+        throw new Error('Course source ID is missing.');
+      }
+
       let source: string;
 
       const course = await Course.query().insert({ ...dto });
@@ -96,7 +105,7 @@ export class Course extends BaseModel {
           source = '';
       }
 
-      await course.$relatedQuery(source).relate(sourceId);
+      await course.$relatedQuery(source).relate(args.sourceId);
 
       await course.$relatedQuery('owner').relate(args.authCtxId);
 
@@ -106,7 +115,7 @@ export class Course extends BaseModel {
     }
   }
 
-  public static async get(id: number, args: BaseDataArgs): Promise<Course> {
+  public static async get(id: number, args: CourseArgs): Promise<Course> {
     try {
       if (typeof args.id === 'undefined') {
         throw new Error('Course ID is missing.');
@@ -128,7 +137,7 @@ export class Course extends BaseModel {
     }
   }
 
-  public static async getAll(args: BaseDataArgs): Promise<Specialty[]> {
+  public static async getAll(args: CourseArgs): Promise<Specialty[]> {
     try {
       if (typeof args.id === 'undefined') {
         throw new Error('Course ID is missing.');
@@ -147,7 +156,7 @@ export class Course extends BaseModel {
     }
   }
 
-  public static async update(dto: CourseDto, args: BaseDataArgs): Promise<boolean> {
+  public static async update(dto: CourseDto, args: CourseArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new Error('Course ID is missing.');
@@ -165,7 +174,7 @@ export class Course extends BaseModel {
     }
   }
 
-  public static async delete(id: number, args: BaseDataArgs): Promise<boolean> {
+  public static async delete(id: number, args: CourseArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new Error('Course ID is missing.');
@@ -200,5 +209,8 @@ export class CourseDto extends BaseDto implements Partial<Course> {
 }
 
 // For fetching the Course data
-// @ArgsType()
-// export class CourseArgs extends BaseDataArgs {}
+@ArgsType()
+export class CourseArgs extends BaseDataArgs {
+  @Field({ nullable: true })
+  sourceId?: number;
+}

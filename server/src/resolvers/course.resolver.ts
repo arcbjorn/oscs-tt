@@ -14,8 +14,8 @@ export class CourseResolver {
   private readonly courses: Course[] = createCourseSamples();
 
   @Query(() => Course, { nullable: true })
-  async getCourse(@Args() { name }: CourseArgs) {
-    const entry = await this.courses.find((course) => course.name === name);
+  async getCourse(@Args() { id }: CourseArgs) {
+    const entry = await this.courses.find((course) => course.id === id);
     if (entry === undefined) {
       throw new Error();
     }

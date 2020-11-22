@@ -1,7 +1,8 @@
 /* eslint-disable no-shadow */
 import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
-  Field, InputType, ObjectType,
+  ArgsType,
+  Field, InputType, ObjectType, registerEnumType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
 import { BaseModel, BaseDto, BaseDataArgs } from './Base';
@@ -15,6 +16,10 @@ export enum TimeEntrySource {
   COURSE,
   SECTION
 }
+
+registerEnumType(TimeEntrySource, {
+  name: 'TimeEntrySource',
+});
 
 @ObjectType({ description: 'Time entry of the user' })
 export class TimeEntry extends BaseModel {
@@ -68,8 +73,12 @@ export class TimeEntry extends BaseModel {
     };
   }
 
-  public static async create(sourceId: number, dto: TimeEntryDto, args: BaseDataArgs): Promise<number> {
+  public static async create(dto: TimeEntryDto, args: TimeEntryArgs): Promise<number> {
     try {
+      if (typeof args.sourceId === 'undefined') {
+        throw new NotFoundError('Time Entry source ID is missing.');
+      }
+
       let source: string;
 
       const timeEntry = await TimeEntry.query().insert({ ...dto });
@@ -88,7 +97,7 @@ export class TimeEntry extends BaseModel {
           source = '';
       }
 
-      await timeEntry.$relatedQuery(source).relate(sourceId);
+      await timeEntry.$relatedQuery(source).relate(args.sourceId);
 
       await timeEntry.$relatedQuery('owner').relate(args.authCtxId);
 
@@ -159,5 +168,8 @@ export class TimeEntryDto extends BaseDto implements Partial<TimeEntry> {
 }
 
 // For fetching the TimeEntry data
-// @ArgsType()
-// export class TimeEntryArgs extends BaseDataArgs {}
+@ArgsType()
+export class TimeEntryArgs extends BaseDataArgs {
+  @Field()
+  sourceId?: number;
+}

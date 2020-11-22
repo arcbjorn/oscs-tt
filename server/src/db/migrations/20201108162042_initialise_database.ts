@@ -159,46 +159,10 @@ export async function up(knex: Knex): Promise<void> {
       FOREIGN KEY ("sectionId") REFERENCES "sections" ("id")
       ON DELETE SET NULL;
   `);
-
-  // NOTES (10)
-
-  await knex.raw(`
-    CREATE TABLE "notes" (
-      "id" SERIAL PRIMARY KEY,
-      "name" VARCHAR(128) NOT NULL,
-      "content" TEXT,
-      "ownerId" INTEGER NOT NULL,
-      "subtopicId" INTEGER,
-      "courseId" INTEGER,
-      "sectionId" INTEGER,
-      "timeEntryId" INTEGER
-    );
-    ALTER TABLE "notes"
-      ADD CONSTRAINT "notes_ownerid_foreign"
-      FOREIGN KEY ("ownerId") REFERENCES "users" ("id")
-      ON DELETE CASCADE;
-    ALTER TABLE "notes"
-      ADD CONSTRAINT "notes_subtopicid_foreign"
-      FOREIGN KEY ("subtopicId") REFERENCES "subtopics" ("id")
-      ON DELETE SET NULL;
-    ALTER TABLE "notes"
-      ADD CONSTRAINT "notes_courseid_foreign"
-      FOREIGN KEY ("courseId") REFERENCES "courses" ("id")
-      ON DELETE SET NULL;
-    ALTER TABLE "notes"
-      ADD CONSTRAINT "notes_sectionid_foreign"
-      FOREIGN KEY ("sectionId") REFERENCES "sections" ("id")
-      ON DELETE SET NULL;
-    ALTER TABLE "notes"
-      ADD CONSTRAINT "notes_timeentryid_foreign"
-      FOREIGN KEY ("timeEntryId") REFERENCES "time_entries" ("id")
-      ON DELETE SET NULL;
-  `);
 }
 
 export async function down(knex: Knex): Promise<void> {
   await knex.raw(`
-    DROP TABLE IF EXISTS "notes";
     DROP TABLE IF EXISTS "time_entries";
     DROP TABLE IF EXISTS "sections";
     DROP TABLE IF EXISTS "courses";

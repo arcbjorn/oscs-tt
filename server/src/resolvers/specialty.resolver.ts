@@ -6,15 +6,17 @@ import {
   Arg,
 } from 'type-graphql';
 
-import { Specialty, SpecialtyArgs, SpecialtyDto } from '../db';
+import {
+  Specialty, BaseDto, BaseDataArgs,
+} from '../db';
 
 @Resolver(Specialty)
 export class SpecialtyResolver {
   private readonly specialtys: Specialty[] = [];
 
   @Query(() => Specialty, { nullable: true })
-  async getSpecialty(@Args() { name }: SpecialtyArgs) {
-    const entry = await this.specialtys.find((specialty) => specialty.name === name);
+  async getSpecialty(@Args() { id }: BaseDataArgs) {
+    const entry = await this.specialtys.find((specialty) => specialty.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -31,7 +33,7 @@ export class SpecialtyResolver {
   }
 
   @Mutation(() => [Specialty])
-  async createSpecialty(@Arg('dto') dto: SpecialtyDto) {
+  async createSpecialty(@Arg('dto') dto: BaseDto) {
     const specialty = Object.assign(new Specialty(), {
       description: dto.description,
       name: dto.name,

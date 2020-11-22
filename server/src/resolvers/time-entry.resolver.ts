@@ -14,8 +14,8 @@ export class TimeEntryResolver {
   private readonly items: TimeEntry[] = createTimeEntrySamples();
 
   @Query(() => TimeEntry, { nullable: true })
-  async timeEntry(@Args() { name }: TimeEntryArgs) {
-    const entry = await this.items.find((timeEntry) => timeEntry.name === name);
+  async timeEntry(@Args() { id }: TimeEntryArgs) {
+    const entry = await this.items.find((timeEntry) => timeEntry.id === id);
     if (entry === undefined) {
       throw new Error();
     }

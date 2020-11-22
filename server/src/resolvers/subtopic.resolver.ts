@@ -6,15 +6,15 @@ import {
   Arg,
 } from 'type-graphql';
 
-import { Subtopic, SubtopicArgs, SubtopicDto } from '../db';
+import { BaseDto, Subtopic, SubtopicArgs } from '../db';
 
 @Resolver(Subtopic)
 export class SubtopicResolver {
   private readonly subtopics: Subtopic[] = [];
 
   @Query(() => Subtopic, { nullable: true })
-  async getSubtopic(@Args() { name }: SubtopicArgs) {
-    const entry = await this.subtopics.find((subtopic) => subtopic.name === name);
+  async getSubtopic(@Args() { id }: SubtopicArgs) {
+    const entry = await this.subtopics.find((subtopic) => subtopic.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -31,7 +31,7 @@ export class SubtopicResolver {
   }
 
   @Mutation(() => [Subtopic])
-  async createSubtopic(@Arg('dto') dto: SubtopicDto) {
+  async createSubtopic(@Arg('dto') dto: BaseDto) {
     const subtopic = Object.assign(new Subtopic(), {
       description: dto.description,
       name: dto.name,

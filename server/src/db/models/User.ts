@@ -1,7 +1,5 @@
-/* eslint-disable max-classes-per-file */
 import { Model } from 'objection';
 import {
-  ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
 
@@ -33,11 +31,4 @@ export class UserDto implements Partial<User> {
 
   @Field({ nullable: true })
   bio?: string;
-}
-
-// For fetching the User data
-@ArgsType()
-export class UserArgs {
-  @Field()
-  id?: number;
 }

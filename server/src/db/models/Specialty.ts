@@ -1,5 +1,6 @@
 import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
+  ArgsType,
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
@@ -56,13 +57,17 @@ export class Specialty extends BaseModel {
     };
   }
 
-  public static async create(subtopicId: number, dto: BaseDto, args: BaseDataArgs): Promise<number> {
+  public static async create(dto: BaseDto, args: SpecialtyArgs): Promise<number> {
     try {
+      if (typeof args.subtopicId === 'undefined') {
+        throw new Error('Topic ID of new Subtopic is missing.');
+      }
+
       const specialty = await Specialty.query().insert({ ...dto });
 
       await specialty.$relatedQuery('owner').relate(args.authCtxId);
 
-      await specialty.$relatedQuery('subtopic').relate(subtopicId);
+      await specialty.$relatedQuery('subtopic').relate(args.subtopicId);
 
       return specialty.id;
     } catch (error: unknown) {
@@ -70,7 +75,7 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async get(args: BaseDataArgs): Promise<Specialty> {
+  public static async get(args: SpecialtyArgs): Promise<Specialty> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Specialty ID is missing.');
@@ -90,7 +95,7 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async getAll(args: BaseDataArgs): Promise<Specialty[]> {
+  public static async getAll(args: SpecialtyArgs): Promise<Specialty[]> {
     try {
       const specialties = await Specialty
         .query()
@@ -105,7 +110,7 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async update(dto: BaseDto, args: BaseDataArgs): Promise<boolean> {
+  public static async update(dto: BaseDto, args: SpecialtyArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Specialty ID is missing.');
@@ -123,7 +128,7 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async delete(args: BaseDataArgs): Promise<boolean> {
+  public static async delete(args: SpecialtyArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Specialty ID is missing.');
@@ -141,13 +146,9 @@ export class Specialty extends BaseModel {
   }
 }
 
-// For creating/updating Specialty
-// @InputType()
-// export class SpecialtyDto extends BaseDto implements Partial<Specialty> {}
-
 // For fetching the Specialty data
-// @ArgsType()
-// export class SpecialtyArgs extends BaseDataArgs {
-//   @Field({ nullable: true })
-//   subtopicId?: number;
-// }
+@ArgsType()
+export class SpecialtyArgs extends BaseDataArgs {
+  @Field({ nullable: true })
+  subtopicId?: number;
+}

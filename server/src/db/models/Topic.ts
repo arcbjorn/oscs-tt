@@ -134,14 +134,3 @@ export class Topic extends BaseModel {
     }
   }
 }
-
-// For creating/updating Topic
-// @InputType()
-// export class TopicDto extends BaseDto implements Partial<Topic> {
-//   @Field({ nullable: true })
-//   department?: string;
-// }
-
-// For fetching the Topic data
-// @ArgsType()
-// export class TopicArgs extends BaseDataArgs {}

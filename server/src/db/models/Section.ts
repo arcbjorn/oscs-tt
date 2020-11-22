@@ -1,20 +1,17 @@
 import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
+  ArgsType,
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
 import { BaseDataArgs, BaseDto, BaseModel } from './Base';
 import { Course } from './Course';
 import { User } from './User';
-import { Note } from './Note';
 import { TimeEntry } from './TimeEntry';
 
 @ObjectType({ description: 'Part of Course' })
 export class Section extends BaseModel {
   static tableName = 'sections';
-
-  @Field(() => Note, { description: 'Notes, related to Course Section' })
-  notes?: Note;
 
   @Field(() => Course, { description: 'Course, which contains Section' })
   course?: Course;
@@ -34,14 +31,6 @@ export class Section extends BaseModel {
   };
 
   static relationMappings = () => ({
-    notes: {
-      relation: Model.HasManyRelation,
-      modelClass: Note,
-      join: {
-        from: 'sections.id',
-        to: 'notes.sectionId',
-      },
-    },
     timeEntries: {
       relation: Model.HasManyRelation,
       modelClass: TimeEntry,
@@ -68,13 +57,17 @@ export class Section extends BaseModel {
     };
   }
 
-  public static async create(courseId: number, dto: BaseDto, args: BaseDataArgs): Promise<number> {
+  public static async create(dto: BaseDto, args: SectionArgs): Promise<number> {
     try {
+      if (typeof args.courseId === 'undefined') {
+        throw new Error('Course ID of Section is missing.');
+      }
+
       const section = await Section.query().insert({ ...dto });
 
       await section.$relatedQuery('owner').relate(args.authCtxId);
 
-      await section.$relatedQuery('course').relate(courseId);
+      await section.$relatedQuery('course').relate(args.courseId);
 
       return section.id;
     } catch (error: unknown) {
@@ -82,7 +75,7 @@ export class Section extends BaseModel {
     }
   }
 
-  public static async get(args: BaseDataArgs): Promise<Section> {
+  public static async get(args: SectionArgs): Promise<Section> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Section ID is missing.');
@@ -102,7 +95,7 @@ export class Section extends BaseModel {
     }
   }
 
-  public static async update(dto: BaseDto, args: BaseDataArgs): Promise<boolean> {
+  public static async update(dto: BaseDto, args: SectionArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Section ID is missing.');
@@ -120,7 +113,7 @@ export class Section extends BaseModel {
     }
   }
 
-  public static async delete(args: BaseDataArgs): Promise<boolean> {
+  public static async delete(args: SectionArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Section ID is missing.');
@@ -138,10 +131,9 @@ export class Section extends BaseModel {
   }
 }
 
-// For creating/updating Subtopic
-// @InputType()
-// export class SubtopicDto extends BaseDto implements Partial<Subtopic> {}
-
-// For fetching the Subtopic data
-// @ArgsType()
-// export class SubtopicArgs extends BaseDataArgs {}
+// For fetching the Section data
+@ArgsType()
+export class SectionArgs extends BaseDataArgs {
+  @Field({ nullable: true })
+  courseId?: number;
+}

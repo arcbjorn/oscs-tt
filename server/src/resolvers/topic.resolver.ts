@@ -6,7 +6,7 @@ import {
   Arg,
 } from 'type-graphql';
 
-import { Topic, TopicArgs, TopicDto } from '../db';
+import { Topic, BaseDataArgs, BaseDto } from '../db';
 import { createTopicSamples } from '../samples';
 
 @Resolver(Topic)
@@ -14,8 +14,8 @@ export class TopicResolver {
   private readonly topics: Topic[] = createTopicSamples();
 
   @Query(() => Topic, { nullable: true })
-  async getTopic(@Args() { name }: TopicArgs): Promise<Topic> {
-    const entry = await this.topics.find((topic) => topic.name === name);
+  async getTopic(@Args() { id }: BaseDataArgs): Promise<Topic> {
+    const entry = await this.topics.find((topic) => topic.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -32,7 +32,7 @@ export class TopicResolver {
   }
 
   @Mutation(() => [Topic])
-  async createTopic(@Arg('dto') dto: TopicDto): Promise<Number> {
+  async createTopic(@Arg('dto') dto: BaseDto): Promise<Number> {
     const topic = Object.assign(new Topic(), {
       description: dto.description,
       name: dto.name,

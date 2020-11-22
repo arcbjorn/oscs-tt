@@ -1,5 +1,6 @@
 import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
+  ArgsType,
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
@@ -80,13 +81,17 @@ export class Subtopic extends BaseModel {
     };
   }
 
-  public static async create(topicId: number, dto: BaseDto, args: BaseDataArgs): Promise<number> {
+  public static async create(dto: BaseDto, args: SubtopicArgs): Promise<number> {
     try {
+      if (typeof args.topicId === 'undefined') {
+        throw new Error('Topic ID of new Subtopic is missing.');
+      }
+
       const subtopic = await Subtopic.query().insert({ ...dto });
 
       await subtopic.$relatedQuery('owner').relate(args.authCtxId);
 
-      await subtopic.$relatedQuery('topic').relate(topicId);
+      await subtopic.$relatedQuery('topic').relate(args.topicId);
 
       return subtopic.id;
     } catch (error: unknown) {
@@ -94,7 +99,7 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async get(args: BaseDataArgs): Promise<Subtopic> {
+  public static async get(args: SubtopicArgs): Promise<Subtopic> {
     try {
       if (typeof args.id === 'undefined') {
         throw new Error('Subtopic ID is missing.');
@@ -115,7 +120,7 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async getAll(args: BaseDataArgs): Promise<Subtopic[]> {
+  public static async getAll(args: SubtopicArgs): Promise<Subtopic[]> {
     try {
       const subtopics = await Subtopic
         .query()
@@ -131,7 +136,7 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async update(dto: BaseDto, args: BaseDataArgs): Promise<boolean> {
+  public static async update(dto: BaseDto, args: SubtopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Subtopic ID is missing.');
@@ -149,7 +154,7 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async delete(args: BaseDataArgs): Promise<boolean> {
+  public static async delete(args: SubtopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Subtopic ID is missing.');
@@ -167,10 +172,9 @@ export class Subtopic extends BaseModel {
   }
 }
 
-// For creating/updating Subtopic
-// @InputType()
-// export class SubtopicDto extends BaseDto implements Partial<Subtopic> {}
-
 // For fetching the Subtopic data
-// @ArgsType()
-// export class SubtopicArgs extends BaseDataArgs {}
+@ArgsType()
+export class SubtopicArgs extends BaseDataArgs {
+  @Field({ nullable: true })
+  topicId?: number;
+}
