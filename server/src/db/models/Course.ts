@@ -1,13 +1,15 @@
 /* eslint-disable no-shadow */
-import { Model } from 'objection';
+import { Model, QueryBuilder } from 'objection';
 import {
   Field, InputType, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseModel, BaseDto } from './Base';
+import { BaseModel, BaseDto, BaseDataArgs } from './Base';
 import { Specialty } from './Specialty';
 import { Section } from './Section';
 import { User } from './User';
+import { TimeEntry } from './TimeEntry';
+import { Subtopic } from './Subtopic';
 
 export enum CourseSource {
   SUBTOPIC,
@@ -24,25 +26,39 @@ export class Course extends BaseModel {
   @Field({ description: 'Course code' })
   code?: string;
 
-  @Field({ description: 'Institution providing Course' })
+  @Field({ description: 'Institution, providing Course' })
   institution?: string;
 
-  @Field(() => Specialty, { description: 'Specific area of academic Sub-topic' })
-  specialty?: Specialty;
+  @Field(() => CourseSource, { description: 'Spcialty or Subtopic' })
+  source!: CourseSource;
 
-  @Field(() => CourseSource, { nullable: true, description: 'Spcialty or Subtopic' })
-  source?: CourseSource;
+  @Field(() => Subtopic, { description: 'Subtopic, which contains Course' })
+  subtopic?: Subtopic;
+
+  @Field(() => Specialty, { description: 'Specialty, which contains Course' })
+  specialty?: Specialty;
 
   @Field(() => Section, { nullable: true, description: 'Parts of Course' })
   sections?: Section[];
 
+  @Field(() => TimeEntry, { nullable: true, description: 'Time spent on Course' })
+  timeEntries?: TimeEntry[];
+
   static relationMappings = () => ({
-    timeEntries: {
+    sections: {
       relation: Model.HasManyRelation,
       modelClass: Section,
       join: {
         from: 'courses.id',
         to: 'sections.courseId',
+      },
+    },
+    timeEntries: {
+      relation: Model.HasManyRelation,
+      modelClass: TimeEntry,
+      join: {
+        from: 'courses.id',
+        to: 'timeEntries.courseId',
       },
     },
     owner: {
@@ -55,7 +71,15 @@ export class Course extends BaseModel {
     },
   });
 
-  public static async create(sourceId: number, dto: CourseDto): Promise<number> {
+  static get modifiers() {
+    return {
+      findOwner(builder: QueryBuilder<Course>, ownerId: number) {
+        builder.where('ownerId', '=', ownerId);
+      },
+    };
+  }
+
+  public static async create(sourceId: number, dto: CourseDto, args: BaseDataArgs): Promise<number> {
     try {
       let source: string;
 
@@ -74,19 +98,28 @@ export class Course extends BaseModel {
 
       await course.$relatedQuery(source).relate(sourceId);
 
+      await course.$relatedQuery('owner').relate(args.authCtxId);
+
       return course.id;
     } catch (error: unknown) {
       throw objectionError(error, 'course.create');
     }
   }
 
-  public static async get(id: number): Promise<Course> {
+  public static async get(id: number, args: BaseDataArgs): Promise<Course> {
     try {
-      const course = Course
+      if (typeof args.id === 'undefined') {
+        throw new Error('Course ID is missing.');
+      }
+
+      const course = await Course
         .query()
-        .findById(id)
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
         .withGraphFetched({
-          sections: true,
+          sections: {
+            notes: true,
+          },
         });
 
       return course;
@@ -95,10 +128,15 @@ export class Course extends BaseModel {
     }
   }
 
-  public static async getAll(): Promise<Specialty[]> {
+  public static async getAll(args: BaseDataArgs): Promise<Specialty[]> {
     try {
-      const courses = Course
+      if (typeof args.id === 'undefined') {
+        throw new Error('Course ID is missing.');
+      }
+
+      const courses = await Course
         .query()
+        .modify('findOwner', args.authCtxId)
         .withGraphFetched({
           sections: true,
         });
@@ -109,9 +147,17 @@ export class Course extends BaseModel {
     }
   }
 
-  public static async update(id: number, dto: CourseDto): Promise<boolean> {
+  public static async update(dto: CourseDto, args: BaseDataArgs): Promise<boolean> {
     try {
-      await Course.query().findById(id).patch({ ...dto });
+      if (typeof args.id === 'undefined') {
+        throw new Error('Course ID is missing.');
+      }
+
+      await Course
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
+        .patch({ ...dto });
 
       return true;
     } catch (error: unknown) {
@@ -119,9 +165,16 @@ export class Course extends BaseModel {
     }
   }
 
-  public static async delete(id: number): Promise<boolean> {
+  public static async delete(id: number, args: BaseDataArgs): Promise<boolean> {
     try {
-      await Course.query().deleteById(id);
+      if (typeof args.id === 'undefined') {
+        throw new Error('Course ID is missing.');
+      }
+
+      await Course
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .deleteById(id);
 
       return true;
     } catch (error: unknown) {
@@ -142,8 +195,8 @@ export class CourseDto extends BaseDto implements Partial<Course> {
   @Field({ nullable: true })
   institution?: string;
 
-  @Field({ nullable: true })
-  source?: CourseSource;
+  @Field({ nullable: false })
+  source!: CourseSource;
 }
 
 // For fetching the Course data

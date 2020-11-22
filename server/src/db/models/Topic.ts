@@ -1,18 +1,15 @@
-import { Model } from 'objection';
+import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseModel, BaseDto } from './Base';
+import { BaseModel, BaseDto, BaseDataArgs } from './Base';
 import { Subtopic } from './Subtopic';
 import { User } from './User';
 
 @ObjectType({ description: 'Academic Topic' })
 export class Topic extends BaseModel {
   static tableName = 'topics';
-
-  @Field()
-  department?: string;
 
   @Field(() => Subtopic, { description: 'Components' })
   subtopics?: Subtopic[];
@@ -47,9 +44,19 @@ export class Topic extends BaseModel {
     },
   });
 
-  public static async create(dto: BaseDto): Promise<number> {
+  static get modifiers() {
+    return {
+      findOwner(builder: QueryBuilder<Topic>, ownerId: number) {
+        builder.where('ownerId', '=', ownerId);
+      },
+    };
+  }
+
+  public static async create(dto: BaseDto, args: BaseDataArgs): Promise<number> {
     try {
       const topic = await Topic.query().insert({ ...dto });
+
+      await topic.$relatedQuery('owner').relate(args.authCtxId);
 
       return topic.id;
     } catch (error: unknown) {
@@ -57,11 +64,16 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async get(id: number): Promise<Topic> {
+  public static async get(args: BaseDataArgs): Promise<Topic> {
     try {
-      const topic = Topic
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Topic ID is missing.');
+      }
+
+      const topic = await Topic
         .query()
-        .findById(id)
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
         .withGraphFetched({
           subtopics: true,
         });
@@ -72,10 +84,11 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async getAll(): Promise<Topic[]> {
+  public static async getAll(args: BaseDataArgs): Promise<Topic[]> {
     try {
-      const topics = Topic
+      const topics = await Topic
         .query()
+        .modify('findOwner', args.authCtxId)
         .withGraphFetched({
           subtopics: true,
         });
@@ -86,9 +99,17 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async update(id: number, dto: BaseDto): Promise<boolean> {
+  public static async update(dto: BaseDto, args: BaseDataArgs): Promise<boolean> {
     try {
-      await Topic.query().findById(id).patch({ ...dto });
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Topic ID is missing.');
+      }
+
+      await Topic
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
+        .patch({ ...dto });
 
       return true;
     } catch (error: unknown) {
@@ -96,9 +117,16 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async delete(id: number): Promise<boolean> {
+  public static async delete(args: BaseDataArgs): Promise<boolean> {
     try {
-      await Topic.query().deleteById(id);
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Topic ID is missing.');
+      }
+
+      await Topic
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .deleteById(args.id);
 
       return true;
     } catch (error: unknown) {

@@ -1,9 +1,9 @@
-import { Model } from 'objection';
+import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseModel, BaseDto } from './Base';
+import { BaseModel, BaseDto, BaseDataArgs } from './Base';
 import { Subtopic } from './Subtopic';
 import { TimeEntry } from './TimeEntry';
 import { User } from './User';
@@ -48,9 +48,19 @@ export class Specialty extends BaseModel {
     },
   });
 
-  public static async create(subtopicId: number, dto: BaseDto): Promise<number> {
+  static get modifiers() {
+    return {
+      findOwner(builder: QueryBuilder<Specialty>, ownerId: number) {
+        builder.where('ownerId', '=', ownerId);
+      },
+    };
+  }
+
+  public static async create(subtopicId: number, dto: BaseDto, args: BaseDataArgs): Promise<number> {
     try {
       const specialty = await Specialty.query().insert({ ...dto });
+
+      await specialty.$relatedQuery('owner').relate(args.authCtxId);
 
       await specialty.$relatedQuery('subtopic').relate(subtopicId);
 
@@ -60,11 +70,16 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async get(id: number): Promise<Specialty> {
+  public static async get(args: BaseDataArgs): Promise<Specialty> {
     try {
-      const specialty = Specialty
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Specialty ID is missing.');
+      }
+
+      const specialty = await Specialty
         .query()
-        .findById(id)
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
         .withGraphFetched({
           courses: true,
         });
@@ -75,10 +90,11 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async getAll(): Promise<Specialty[]> {
+  public static async getAll(args: BaseDataArgs): Promise<Specialty[]> {
     try {
-      const specialties = Specialty
+      const specialties = await Specialty
         .query()
+        .modify('findOwner', args.authCtxId)
         .withGraphFetched({
           courses: true,
         });
@@ -89,9 +105,17 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async update(id: number, dto: BaseDto): Promise<boolean> {
+  public static async update(dto: BaseDto, args: BaseDataArgs): Promise<boolean> {
     try {
-      await Specialty.query().findById(id).patch({ ...dto });
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Specialty ID is missing.');
+      }
+
+      await Specialty
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
+        .patch({ ...dto });
 
       return true;
     } catch (error: unknown) {
@@ -99,9 +123,16 @@ export class Specialty extends BaseModel {
     }
   }
 
-  public static async delete(id: number): Promise<boolean> {
+  public static async delete(args: BaseDataArgs): Promise<boolean> {
     try {
-      await Specialty.query().deleteById(id);
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Specialty ID is missing.');
+      }
+
+      await Specialty
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .deleteById(args.id);
 
       return true;
     } catch (error: unknown) {

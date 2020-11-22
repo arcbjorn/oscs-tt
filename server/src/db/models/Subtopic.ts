@@ -1,11 +1,12 @@
-import { Model } from 'objection';
+import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseDto, BaseModel } from './Base';
+import { BaseDataArgs, BaseDto, BaseModel } from './Base';
 import { Course } from './Course';
 import { Specialty } from './Specialty';
+import { TimeEntry } from './TimeEntry';
 import { Topic } from './Topic';
 import { User } from './User';
 
@@ -21,6 +22,9 @@ export class Subtopic extends BaseModel {
 
   @Field(() => [Course], { description: 'Courses without specialty' })
   courses?: Course[];
+
+  @Field(() => TimeEntry, { nullable: true, description: 'Time spent on Subtopic' })
+  timeEntries?: TimeEntry[];
 
   static jsonSchema = {
     type: 'object',
@@ -50,6 +54,14 @@ export class Subtopic extends BaseModel {
         to: 'courses.subtopicId',
       },
     },
+    timeEntries: {
+      relation: Model.HasManyRelation,
+      modelClass: TimeEntry,
+      join: {
+        from: 'subtopics.id',
+        to: 'timeEntries.subtopicId',
+      },
+    },
     owner: {
       relation: Model.BelongsToOneRelation,
       modelClass: User,
@@ -60,9 +72,19 @@ export class Subtopic extends BaseModel {
     },
   });
 
-  public static async create(topicId: number, dto: BaseDto): Promise<number> {
+  static get modifiers() {
+    return {
+      findOwner(builder: QueryBuilder<Subtopic>, ownerId: number) {
+        builder.where('ownerId', '=', ownerId);
+      },
+    };
+  }
+
+  public static async create(topicId: number, dto: BaseDto, args: BaseDataArgs): Promise<number> {
     try {
       const subtopic = await Subtopic.query().insert({ ...dto });
+
+      await subtopic.$relatedQuery('owner').relate(args.authCtxId);
 
       await subtopic.$relatedQuery('topic').relate(topicId);
 
@@ -72,11 +94,16 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async get(id: number): Promise<Subtopic> {
+  public static async get(args: BaseDataArgs): Promise<Subtopic> {
     try {
-      const subtopic = Subtopic
+      if (typeof args.id === 'undefined') {
+        throw new Error('Subtopic ID is missing.');
+      }
+
+      const subtopic = await Subtopic
         .query()
-        .findById(id)
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
         .withGraphFetched({
           specialties: true,
           courses: true,
@@ -88,10 +115,11 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async getAll(): Promise<Subtopic[]> {
+  public static async getAll(args: BaseDataArgs): Promise<Subtopic[]> {
     try {
-      const subtopics = Subtopic
+      const subtopics = await Subtopic
         .query()
+        .modify('findOwner', args.authCtxId)
         .withGraphFetched({
           specialties: true,
           courses: true,
@@ -103,9 +131,17 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async update(id: number, dto: BaseDto): Promise<boolean> {
+  public static async update(dto: BaseDto, args: BaseDataArgs): Promise<boolean> {
     try {
-      await Subtopic.query().findById(id).patch({ ...dto });
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Subtopic ID is missing.');
+      }
+
+      await Subtopic
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .findById(args.id)
+        .patch({ ...dto });
 
       return true;
     } catch (error: unknown) {
@@ -113,9 +149,16 @@ export class Subtopic extends BaseModel {
     }
   }
 
-  public static async delete(id: number): Promise<boolean> {
+  public static async delete(args: BaseDataArgs): Promise<boolean> {
     try {
-      await Subtopic.query().deleteById(id);
+      if (typeof args.id === 'undefined') {
+        throw new NotFoundError('Subtopic ID is missing.');
+      }
+
+      await Subtopic
+        .query()
+        .modify('findOwner', args.authCtxId)
+        .deleteById(args.id);
 
       return true;
     } catch (error: unknown) {
