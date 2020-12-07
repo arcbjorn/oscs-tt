@@ -5,6 +5,7 @@ import { resolve } from 'path';
 import { ApolloServer } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
 import {
+  UserResolver,
   TimeEntryResolver,
   CourseResolver,
   SpecialtyResolver,
@@ -17,6 +18,7 @@ dotenv.config();
 (async () => {
   const schema = await buildSchema({
     resolvers: [
+      UserResolver,
       TimeEntryResolver,
       CourseResolver,
       SpecialtyResolver,

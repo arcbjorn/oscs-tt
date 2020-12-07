@@ -18,6 +18,9 @@ export class User extends Model {
 
   @Field()
   bio?: string;
+
+  @Field()
+  secret?: string;
 }
 
 // For creating/updating User

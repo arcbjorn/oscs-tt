@@ -1,4 +1,10 @@
-import { TimeEntry, Course, Topic } from './db';
+import {
+  TimeEntry, Course, Topic, User,
+} from './db';
+
+function createUser(timeEntryData: Partial<User>) {
+  return Object.assign(new User(), timeEntryData);
+}
 
 function createTimeEntry(timeEntryData: Partial<TimeEntry>) {
   return Object.assign(new TimeEntry(), timeEntryData);
@@ -65,6 +71,15 @@ export function createTopicSamples() {
     createTopic({
       name: 'Topic 3',
       description: 'Topic Desc 3',
+    }),
+  ];
+}
+
+export function createUserSamples() {
+  return [
+    createUser({
+      name: 'Arc',
+      secret: 'secret',
     }),
   ];
 }
