@@ -1,23 +1,18 @@
 import React from 'react';
 import Container from '@material-ui/core/Container';
-import Box from '@material-ui/core/Box';
+import SignIn from './pages/SignIn';
+import { Box } from '@material-ui/core';
 
 function App() {
   return (
-    <Container maxWidth="sm">
-      <Box my={4}>
-        <img className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <p>HELLO NASTYA</p>
-        <a
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+    <Container>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <SignIn />
       </Box>
     </Container>
   );
