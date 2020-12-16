@@ -1,19 +1,23 @@
 import React from 'react';
 import Container from '@material-ui/core/Container';
-import SignIn from './pages/SignIn';
-import { Box } from '@material-ui/core';
+import SignInAndSignUpPage from './pages/SignInAndSignUpPage';
+import { Redirect, Route, Switch } from 'react-router-dom';
 
 function App() {
   return (
     <Container>
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <SignIn />
-      </Box>
+      <Switch>
+        <Route exact path="/" component={HomePage} />
+        <Route
+          exact
+          path="/signin"
+          render={() => (currentUser ? (
+            <Redirect to="/" />
+          ) : (
+            <SignInAndSignUpPage />
+          ))}
+        />
+      </Switch>
     </Container>
   );
 }
