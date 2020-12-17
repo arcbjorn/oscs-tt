@@ -1,17 +1,20 @@
 import React from 'react';
-import Container from '@material-ui/core/Container';
-import SignInAndSignUpPage from './pages/SignInAndSignUpPage';
 import { Redirect, Route, Switch } from 'react-router-dom';
+
+import Container from '@material-ui/core/Container';
+
+import SignInAndSignUpPage from './pages/SignInAndSignUpPage';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
     <Container>
       <Switch>
-        <Route exact path="/" component={HomePage} />
+        <Route exact path="/" component={LandingPage} />
         <Route
           exact
           path="/signin"
-          render={() => (currentUser ? (
+          render={() => (false ? (
             <Redirect to="/" />
           ) : (
             <SignInAndSignUpPage />
