@@ -14,11 +14,7 @@ function App() {
         <Route
           exact
           path="/signin"
-          render={() => (false ? (
-            <Redirect to="/" />
-          ) : (
-            <SignInAndSignUpPage />
-          ))}
+          render={() => (false ? <Redirect to="/" /> : <SignInAndSignUpPage />)}
         />
       </Switch>
     </Container>

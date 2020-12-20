@@ -19,8 +19,7 @@ function Copyright() {
       <Link color="inherit" href="https://material-ui.com/">
         Your Website
       </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
+      {new Date().getFullYear()}.
     </Typography>
   );
 }
@@ -60,7 +59,7 @@ export default function SignInAndSignUpPage() {
   const classes = useStyles();
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" >
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
       <Grid container component="main" className={classes.root}>
         <Grid item xs={false} sm={4} md={7} className={classes.image} />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
@@ -109,13 +108,13 @@ export default function SignInAndSignUpPage() {
               </Button>
               <Grid container>
                 <Grid item xs>
-                  <Link href="#" variant="body2">
+                  <Link href="/" variant="body2">
                     Forgot password?
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
+                  <Link href="/" variant="body2">
+                    Dont have an account? Sign Up
                   </Link>
                 </Grid>
               </Grid>
