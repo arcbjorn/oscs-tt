@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container';
 import SignInAndSignUpPage from './pages/SignInAndSignUpPage';
 import LandingPage from './pages/LandingPage';
 
-function App() {
+const App: React.FC = () => {
   return (
     <Container>
       <Switch>
@@ -20,6 +20,6 @@ function App() {
       </Switch>
     </Container>
   );
-}
+};
 
 export default App;
