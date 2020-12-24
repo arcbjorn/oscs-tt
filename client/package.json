@@ -13,10 +13,12 @@
     "lint": "tsc --noEmit && eslint src/**/*.ts{,x}"
   },
   "dependencies": {
+    "@apollo/client": "^3.3.6",
     "@emotion/react": "^11.1.2",
     "@emotion/styled": "^11.0.0",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
+    "graphql": "^15.4.0",
     "i18next": "^19.8.4",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
