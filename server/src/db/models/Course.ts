@@ -5,7 +5,7 @@ import {
   Field, InputType, ObjectType, registerEnumType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseModel, BaseDto, BaseDataArgs } from './Base';
+import { BaseModel, BaseDto } from './Base';
 import { Specialty } from './Specialty';
 import { Section } from './Section';
 import { User } from './User';
@@ -210,7 +210,14 @@ export class CourseDto extends BaseDto implements Partial<Course> {
 
 // For fetching the Course data
 @ArgsType()
-export class CourseArgs extends BaseDataArgs {
+export class CourseArgs {
+  @Field()
+  id?: number;
+
+  // TODO: Auth Context
+  @Field({ nullable: true })
+  authCtxId!: number;
+
   @Field({ nullable: true })
   sourceId?: number;
 }

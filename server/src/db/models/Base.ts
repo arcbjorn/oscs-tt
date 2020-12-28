@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-classes-per-file
 import { Model } from 'objection';
 import {
-  ArgsType, Field, InputType, ObjectType,
+  Field, InputType, ObjectType,
 } from 'type-graphql';
 import { User } from './User';
 
@@ -30,13 +30,4 @@ export class BaseDto {
 
   @Field({ nullable: true })
   ownerId?: number;
-}
-
-@ArgsType()
-export class BaseDataArgs {
-  @Field()
-  id?: number;
-
-  @Field({ nullable: true })
-  authCtxId!: number;
 }

@@ -5,7 +5,7 @@ import {
   Field, InputType, ObjectType, registerEnumType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseModel, BaseDto, BaseDataArgs } from './Base';
+import { BaseModel, BaseDto } from './Base';
 import { Course } from './Course';
 import { Section } from './Section';
 import { Specialty } from './Specialty';
@@ -107,7 +107,7 @@ export class TimeEntry extends BaseModel {
     }
   }
 
-  public static async get(args: BaseDataArgs): Promise<TimeEntry> {
+  public static async get(args: TimeEntryArgs): Promise<TimeEntry> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Time Entry ID is missing.');
@@ -124,7 +124,7 @@ export class TimeEntry extends BaseModel {
     }
   }
 
-  public static async update(dto: TimeEntryDto, args: BaseDataArgs): Promise<boolean> {
+  public static async update(dto: TimeEntryDto, args: TimeEntryArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Time Entry ID is missing.');
@@ -142,7 +142,7 @@ export class TimeEntry extends BaseModel {
     }
   }
 
-  public static async delete(args: BaseDataArgs): Promise<boolean> {
+  public static async delete(args: TimeEntryArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Time Entry ID is missing.');
@@ -169,7 +169,13 @@ export class TimeEntryDto extends BaseDto implements Partial<TimeEntry> {
 
 // For fetching the TimeEntry data
 @ArgsType()
-export class TimeEntryArgs extends BaseDataArgs {
+export class TimeEntryArgs {
+  @Field()
+  id?: number;
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+
   @Field()
   sourceId?: number;
 }

@@ -4,7 +4,7 @@ import {
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseDataArgs, BaseDto, BaseModel } from './Base';
+import { BaseDto, BaseModel } from './Base';
 import { Course } from './Course';
 import { Specialty } from './Specialty';
 import { TimeEntry } from './TimeEntry';
@@ -174,7 +174,13 @@ export class Subtopic extends BaseModel {
 
 // For fetching the Subtopic data
 @ArgsType()
-export class SubtopicArgs extends BaseDataArgs {
+export class SubtopicArgs {
+  @Field()
+  id?: number;
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+
   @Field({ nullable: true })
   topicId?: number;
 }

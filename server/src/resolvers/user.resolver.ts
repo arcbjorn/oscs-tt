@@ -6,7 +6,7 @@ import {
   Arg,
 } from 'type-graphql';
 
-import { User, BaseDataArgs, BaseDto } from '../db';
+import { User, UserArgs, BaseDto } from '../db';
 import { createUserSamples } from '../samples';
 
 @Resolver(User)
@@ -14,7 +14,7 @@ export class UserResolver {
   private readonly users: User[] = createUserSamples();
 
   @Query(() => User, { nullable: true })
-  async getUser(@Args() { id }: BaseDataArgs): Promise<User> {
+  async getUser(@Args() { id }: UserArgs): Promise<User> {
     const entry = await this.users.find((user) => user.id === id);
     if (entry === undefined) {
       throw new Error();

@@ -4,7 +4,7 @@ import {
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseDataArgs, BaseDto, BaseModel } from './Base';
+import { BaseDto, BaseModel } from './Base';
 import { Course } from './Course';
 import { User } from './User';
 import { TimeEntry } from './TimeEntry';
@@ -133,7 +133,15 @@ export class Section extends BaseModel {
 
 // For fetching the Section data
 @ArgsType()
-export class SectionArgs extends BaseDataArgs {
+export class SectionArgs {
+  @Field()
+  id?: number;
+
+  // TODO: Auth Context
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+
   @Field({ nullable: true })
   courseId?: number;
 }

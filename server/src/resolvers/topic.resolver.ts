@@ -6,7 +6,7 @@ import {
   Arg,
 } from 'type-graphql';
 
-import { Topic, BaseDataArgs, BaseDto } from '../db';
+import { Topic, TopicArgs, BaseDto } from '../db';
 import { createTopicSamples } from '../samples';
 
 @Resolver(Topic)
@@ -14,7 +14,7 @@ export class TopicResolver {
   private readonly topics: Topic[] = createTopicSamples();
 
   @Query(() => Topic, { nullable: true })
-  async getTopic(@Args() { id }: BaseDataArgs): Promise<Topic> {
+  async getTopic(@Args() { id }: TopicArgs): Promise<Topic> {
     const entry = await this.topics.find((topic) => topic.id === id);
     if (entry === undefined) {
       throw new Error();

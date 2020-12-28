@@ -1,9 +1,10 @@
 import { Model, NotFoundError, QueryBuilder } from 'objection';
 import {
+  ArgsType,
   Field, ObjectType,
 } from 'type-graphql';
 import { objectionError } from '../utils/error.handler';
-import { BaseModel, BaseDto, BaseDataArgs } from './Base';
+import { BaseModel, BaseDto } from './Base';
 import { Subtopic } from './Subtopic';
 import { User } from './User';
 
@@ -52,7 +53,7 @@ export class Topic extends BaseModel {
     };
   }
 
-  public static async create(dto: BaseDto, args: BaseDataArgs): Promise<number> {
+  public static async create(dto: BaseDto, args: TopicArgs): Promise<number> {
     try {
       const topic = await Topic.query().insert({ ...dto });
 
@@ -64,7 +65,7 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async get(args: BaseDataArgs): Promise<Topic> {
+  public static async get(args: TopicArgs): Promise<Topic> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Topic ID is missing.');
@@ -84,7 +85,7 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async getAll(args: BaseDataArgs): Promise<Topic[]> {
+  public static async getAll(args: TopicArgs): Promise<Topic[]> {
     try {
       const topics = await Topic
         .query()
@@ -99,7 +100,7 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async update(dto: BaseDto, args: BaseDataArgs): Promise<boolean> {
+  public static async update(dto: BaseDto, args: TopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Topic ID is missing.');
@@ -117,7 +118,7 @@ export class Topic extends BaseModel {
     }
   }
 
-  public static async delete(args: BaseDataArgs): Promise<boolean> {
+  public static async delete(args: TopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
         throw new NotFoundError('Topic ID is missing.');
@@ -133,4 +134,14 @@ export class Topic extends BaseModel {
       throw objectionError(error, 'topic.delete');
     }
   }
+}
+
+// For fetching the TimeEntry data
+@ArgsType()
+export class TopicArgs {
+  @Field()
+  id?: number;
+
+  @Field({ nullable: true })
+  authCtxId!: number;
 }
