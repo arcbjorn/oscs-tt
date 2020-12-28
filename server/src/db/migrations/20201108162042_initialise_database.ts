@@ -23,8 +23,7 @@ export async function up(knex: Knex): Promise<void> {
     );
     ALTER TABLE "users"
       ADD CONSTRAINT "users_languageid_foreign"
-      FOREIGN KEY ("languageId") REFERENCES "languages" ("id")
-      ON DELETE SET NULL;
+      FOREIGN KEY ("languageId") REFERENCES "languages" ("id");
   `);
 
   // TOPICS (3)
