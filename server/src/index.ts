@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import { resolve } from 'path';
 import { ApolloServer } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
+import * as db from './db';
 import {
   UserResolver,
   TimeEntryResolver,
@@ -38,6 +39,14 @@ dotenv.config();
       settings: {
         'request.credentials': 'same-origin',
       },
+    },
+    context: async (ctx) => {
+      const authCtx = await db.User.createAuthContext(ctx.req);
+      return {
+        ...ctx,
+        auth: authCtx,
+        db,
+      };
     },
   });
 
