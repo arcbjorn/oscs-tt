@@ -10,6 +10,7 @@ import SignInAndSignUpPage from './pages/SignInAndSignUpPage';
 import LandingPage from './pages/LandingPage';
 
 const App: React.FC = () => {
+  const f = false;
   return (
     <ApolloProvider client={client}>
       <Container>
@@ -18,7 +19,7 @@ const App: React.FC = () => {
           <Route
             exact
             path="/signin"
-            render={() => (false ? <Redirect to="/" /> : <SignInAndSignUpPage />)}
+            render={() => (f === false ? <Redirect to="/" /> : <SignInAndSignUpPage />)}
           />
         </Switch>
       </Container>
