@@ -21,6 +21,19 @@ registerEnumType(TimeEntrySource, {
   name: 'TimeEntrySource',
 });
 
+// For fetching the TimeEntry data
+@ArgsType()
+export class TimeEntryArgs {
+  @Field()
+  id?: number;
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+
+  @Field()
+  sourceId?: number;
+}
+
 @ObjectType({ description: 'Time entry of the user' })
 export class TimeEntry extends BaseModel {
   static tableName = 'timeEntries';
@@ -165,17 +178,4 @@ export class TimeEntry extends BaseModel {
 export class TimeEntryDto extends BaseDto implements Partial<TimeEntry> {
   @Field({ nullable: false })
   source!: TimeEntrySource;
-}
-
-// For fetching the TimeEntry data
-@ArgsType()
-export class TimeEntryArgs {
-  @Field()
-  id?: number;
-
-  @Field({ nullable: true })
-  authCtxId!: number;
-
-  @Field()
-  sourceId?: number;
 }

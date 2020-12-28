@@ -9,6 +9,19 @@ import { Subtopic } from './Subtopic';
 import { TimeEntry } from './TimeEntry';
 import { User } from './User';
 
+// For fetching the Specialty data
+@ArgsType()
+export class SpecialtyArgs {
+  @Field()
+  id?: number;
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+
+  @Field({ nullable: true })
+  subtopicId?: number;
+}
+
 @ObjectType({ description: 'Academic Specialty' })
 export class Specialty extends BaseModel {
   static tableName = 'specialties';
@@ -144,17 +157,4 @@ export class Specialty extends BaseModel {
       throw objectionError(error, 'specialty.delete');
     }
   }
-}
-
-// For fetching the Specialty data
-@ArgsType()
-export class SpecialtyArgs {
-  @Field()
-  id?: number;
-
-  @Field({ nullable: true })
-  authCtxId!: number;
-
-  @Field({ nullable: true })
-  subtopicId?: number;
 }

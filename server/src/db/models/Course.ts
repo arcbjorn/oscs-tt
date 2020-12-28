@@ -21,6 +21,36 @@ registerEnumType(CourseSource, {
   name: 'CourseSource',
 });
 
+// For creating/updating Course
+@InputType()
+export class CourseDto extends BaseDto implements Partial<Course> {
+  @Field({ nullable: true })
+  instructor?: string;
+
+  @Field({ nullable: true })
+  code?: string;
+
+  @Field({ nullable: true })
+  institution?: string;
+
+  @Field({ nullable: false })
+  source!: CourseSource;
+}
+
+// For fetching the Course data
+@ArgsType()
+export class CourseArgs {
+  @Field()
+  id?: number;
+
+  // TODO: Auth Context
+  @Field({ nullable: true })
+  authCtxId!: number;
+
+  @Field({ nullable: true })
+  sourceId?: number;
+}
+
 @ObjectType({ description: 'Educational Course' })
 export class Course extends BaseModel {
   static tableName = 'courses';
@@ -190,34 +220,4 @@ export class Course extends BaseModel {
       throw objectionError(error, 'course.delete');
     }
   }
-}
-
-// For creating/updating Course
-@InputType()
-export class CourseDto extends BaseDto implements Partial<Course> {
-  @Field({ nullable: true })
-  instructor?: string;
-
-  @Field({ nullable: true })
-  code?: string;
-
-  @Field({ nullable: true })
-  institution?: string;
-
-  @Field({ nullable: false })
-  source!: CourseSource;
-}
-
-// For fetching the Course data
-@ArgsType()
-export class CourseArgs {
-  @Field()
-  id?: number;
-
-  // TODO: Auth Context
-  @Field({ nullable: true })
-  authCtxId!: number;
-
-  @Field({ nullable: true })
-  sourceId?: number;
 }

@@ -8,6 +8,16 @@ import { BaseModel, BaseDto } from './Base';
 import { Subtopic } from './Subtopic';
 import { User } from './User';
 
+// For fetching the Topic data
+@ArgsType()
+export class TopicArgs {
+  @Field()
+  id?: number;
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+}
+
 @ObjectType({ description: 'Academic Topic' })
 export class Topic extends BaseModel {
   static tableName = 'topics';
@@ -134,14 +144,4 @@ export class Topic extends BaseModel {
       throw objectionError(error, 'topic.delete');
     }
   }
-}
-
-// For fetching the TimeEntry data
-@ArgsType()
-export class TopicArgs {
-  @Field()
-  id?: number;
-
-  @Field({ nullable: true })
-  authCtxId!: number;
 }

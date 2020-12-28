@@ -3,10 +3,29 @@ import {
   ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
-import { verifyAccessToken } from '../../utils/jwt.helpers';
-import AuthContext from '../../auth';
+import { generateToken, setRefreshToken, TokenType } from '../../auth/jwt.helpers';
+import { AuthResult } from '../../auth/AuthResult';
+import { checkSecret } from '../../auth/bcrypt.helper';
+import { Language } from './Language';
 
-@ObjectType({ description: 'User' })
+// For creating/updating User
+@InputType()
+export class UserDto implements Partial<User> {
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  bio?: string;
+}
+
+// For fetching the User data
+@ArgsType()
+export class UserArgs {
+  @Field()
+  id?: number;
+}
+
+@ObjectType({ description: 'OSCSTT User' })
 export class User extends Model {
   static tableName = 'users';
 
@@ -14,54 +33,68 @@ export class User extends Model {
   id!: number;
 
   @Field()
-  username!: string;
+  secret!: string;
 
   @Field()
-  name?: string;
+  name!: string;
+
+  @Field()
+  language!: Language;
 
   @Field()
   bio?: string;
 
-  @Field()
-  secret?: string;
+  static relationMappings = () => ({
+    language: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: Language,
+      join: {
+        from: 'users.languageId',
+        to: 'languages.id',
+      },
+    },
+  });
 
-  public static async createAuthContext(req: any): Promise<AuthContext> {
-    // Extract the auth header from the HTTP request
-    let authentication = req.headers[process.env.AUTH_HEADER_NAME!];
-    if (typeof authentication !== 'string') { authentication = ''; }
-
-    // and extract the JWT token from the header value
-    const authToken = authentication
-      ? authentication.startsWith(process.env.AUTH_HEADER_PREFIX)
-      && authentication.substr(process.env.AUTH_HEADER_PREFIX!.length + 1)
-      : null;
-
-    // Validate the JWT token and extract the user data
-    const auth = await verifyAccessToken(authToken);
-
-    return new AuthContext(auth?.id, auth?.email, auth?.name, auth?.language);
+  public checkSecret(password: string) {
+    return checkSecret(password, this.secret);
   }
-}
 
-// For creating/updating User
-@InputType()
-export class UserDto implements Partial<User> {
-  @Field()
-  username!: string;
+  public static async login(email: string, password: string, res: any): Promise<AuthResult> {
+    const user = await User
+      .query()
+      .where('email', '=', email)
+      .first()
+      .withGraphFetched('language');
 
-  @Field({ nullable: true })
-  name?: string;
+    if (!user) {
+      return {
+        accessToken: '',
+        refreshTokenExpiry: 0,
+        error: 'User not found!',
+      };
+    }
 
-  @Field({ nullable: true })
-  bio?: string;
-}
+    const match = await user.checkSecret(password);
+    if (!match) {
+      return {
+        accessToken: '',
+        refreshTokenExpiry: 0,
+        error: 'Wrong password!',
+      };
+    }
+    const { id, name, language } = user;
+    const {
+      token: refreshToken, expiresIn: refreshTokenExpiry,
+    } = await generateToken({ id }, TokenType.REFRESH);
 
-// For fetching the Specialty data
-@ArgsType()
-export class UserArgs {
-  @Field()
-  id?: number;
+    const { token: accessToken } = await generateToken({
+      id, email, name, language: language.id,
+    }, TokenType.ACCESS);
 
-  @Field({ nullable: true })
-  authCtxId!: number;
+    setRefreshToken(res, refreshToken);
+    return {
+      accessToken,
+      refreshTokenExpiry,
+    };
+  }
 }

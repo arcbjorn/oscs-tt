@@ -11,6 +11,19 @@ import { TimeEntry } from './TimeEntry';
 import { Topic } from './Topic';
 import { User } from './User';
 
+// For fetching the Subtopic data
+@ArgsType()
+export class SubtopicArgs {
+  @Field()
+  id?: number;
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+
+  @Field({ nullable: true })
+  topicId?: number;
+}
+
 @ObjectType({ description: 'Academic Sub-topic' })
 export class Subtopic extends BaseModel {
   static tableName = 'subtopics';
@@ -170,17 +183,4 @@ export class Subtopic extends BaseModel {
       throw objectionError(error, 'subtopic.delete');
     }
   }
-}
-
-// For fetching the Subtopic data
-@ArgsType()
-export class SubtopicArgs {
-  @Field()
-  id?: number;
-
-  @Field({ nullable: true })
-  authCtxId!: number;
-
-  @Field({ nullable: true })
-  topicId?: number;
 }

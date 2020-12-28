@@ -9,6 +9,21 @@ import { Course } from './Course';
 import { User } from './User';
 import { TimeEntry } from './TimeEntry';
 
+// For fetching the Section data
+@ArgsType()
+export class SectionArgs {
+  @Field()
+  id?: number;
+
+  // TODO: Auth Context
+
+  @Field({ nullable: true })
+  authCtxId!: number;
+
+  @Field({ nullable: true })
+  courseId?: number;
+}
+
 @ObjectType({ description: 'Part of Course' })
 export class Section extends BaseModel {
   static tableName = 'sections';
@@ -129,19 +144,4 @@ export class Section extends BaseModel {
       throw objectionError(error, 'section.delete');
     }
   }
-}
-
-// For fetching the Section data
-@ArgsType()
-export class SectionArgs {
-  @Field()
-  id?: number;
-
-  // TODO: Auth Context
-
-  @Field({ nullable: true })
-  authCtxId!: number;
-
-  @Field({ nullable: true })
-  courseId?: number;
 }
