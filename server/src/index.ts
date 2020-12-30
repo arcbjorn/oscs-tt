@@ -40,11 +40,11 @@ dotenv.config();
         'request.credentials': 'same-origin',
       },
     },
-    context: async (ctx) => {
-      const authCtx = await AuthContext.create(ctx.req);
+    context: async (context) => {
+      const auth = await AuthContext.create(context.req);
       return {
-        ...ctx,
-        auth: authCtx,
+        ...context,
+        auth,
       };
     },
   });

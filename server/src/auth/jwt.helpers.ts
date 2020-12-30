@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt from 'jsonwebtoken';
 import { registerEnumType } from 'type-graphql';
 
@@ -15,7 +16,7 @@ export interface TokenPayload {
   id: number;
   email?: string;
   name?: string;
-  language?: number;
+  languageId?: number;
 }
 
 export const jwtSign = (
@@ -23,8 +24,8 @@ export const jwtSign = (
   secret: string,
   options: jwt.SignOptions,
 ): Promise<string> => new Promise((resolve, reject) => {
-  jwt.sign(payload, secret, options, (err, token) => {
-    if (err) reject(err); else resolve(token!);
+  jwt.sign(payload, secret, options, (error, token) => {
+    if (error) reject(error); else resolve(token!);
   });
 });
 
@@ -33,8 +34,8 @@ export const jwtVerify = (
   secret: string,
   options: jwt.VerifyOptions,
 ): Promise<object> => new Promise((resolve, reject) => {
-  jwt.verify(token, secret, options, (err, decoded) => {
-    if (err) reject(err); else resolve(decoded!);
+  jwt.verify(token, secret, options, (error, decodedToken) => {
+    if (error) reject(error); else resolve(decodedToken!);
   });
 });
 
@@ -78,13 +79,47 @@ export const generateToken = async (payload: TokenPayload, tokenType: TokenType)
   return { token, expiresIn };
 };
 
-// TODO: Cookie to header jwt
+export const verifyRefreshToken = async (token: string) => {
+  try {
+    const payload = await jwtVerify(
+      token,
+      process.env.AUTH_REFRESH_SECRET!,
+      { subject: process.env.AUTH_REFRESH_SUBJECT },
+    ) as TokenPayload;
+    // TODO Check here if user is not in stop list
+    return payload;
+  } catch {
+    return null;
+  }
+};
 
+// Extract refresh token from the GraphQL context
+export const getRefreshToken = (req: any) => {
+  let { cookie } = req.headers;
+  if (!cookie) return null;
+  cookie = cookie
+    .split(';')
+    .find((keyValuePair: string) => keyValuePair.trim().startsWith(`${process.env.AUTH_REFRESH_COOKIE_NAME}=`));
+  const refreshToken = cookie.substr(cookie.indexOf('=') + 1);
+  return refreshToken;
+};
+
+// Add refresh token to the GraphQL context
 export const setRefreshToken = (res: any, refreshToken: string) => {
   const maxAge = process.env.AUTH_REFRESH_TOKEN_TTL;
   const secure = '';
   res.setHeader(
     'Set-Cookie',
     `${process.env.AUTH_REFRESH_COOKIE_NAME}=${refreshToken}; Max-Age=${maxAge}; HttpOnly; SameSite=Strict${secure}`,
+  );
+};
+
+// Remove refresh token cookie
+export const removeRefreshToken = (res: any) => {
+  const maxAge = -1;
+  const secure = '';
+  res.setHeader(
+    'Set-Cookie',
+    `${process.env.AUTH_REFRESH_COOKIE_NAME}=; Max-Age=${maxAge}; HttpOnly; SameSite=Strict${secure}`,
   );
 };

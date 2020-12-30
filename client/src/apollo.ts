@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 
 const link = createHttpLink({
   uri: process.env.APP_API_URL,
-  // credentials: 'include',
+  credentials: 'include',
 });
 
 const authLink = setContext((_, { headers }) => {

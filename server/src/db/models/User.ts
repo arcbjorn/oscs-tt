@@ -3,7 +3,11 @@ import {
   ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
-import { generateToken, setRefreshToken, TokenType } from '../../auth/jwt.helpers';
+import { AuthenticationError } from 'apollo-server';
+import DefaultContext from '../../DefaultContext';
+import {
+  generateToken, getRefreshToken, removeRefreshToken, setRefreshToken, TokenType, verifyRefreshToken,
+} from '../../auth/jwt.helpers';
 import { AuthResult } from '../../auth/AuthResult';
 import { checkSecret } from '../../auth/bcrypt.helper';
 import { Language } from './Language';
@@ -37,6 +41,9 @@ export class User extends Model {
 
   @Field()
   name!: string;
+
+  @Field()
+  email!: string;
 
   @Field()
   language!: Language;
@@ -82,19 +89,51 @@ export class User extends Model {
         error: 'Wrong password!',
       };
     }
+
     const { id, name, language } = user;
     const {
       token: refreshToken, expiresIn: refreshTokenExpiry,
     } = await generateToken({ id }, TokenType.REFRESH);
 
     const { token: accessToken } = await generateToken({
-      id, email, name, language: language.id,
+      id, email, name, languageId: language.id,
     }, TokenType.ACCESS);
 
     setRefreshToken(res, refreshToken);
+
     return {
       accessToken,
       refreshTokenExpiry,
     };
+  }
+
+  public static async refresh({ req, res }: DefaultContext): Promise<AuthResult> {
+    const currentRefreshToken = getRefreshToken(req);
+
+    const refreshTokenPayload = await verifyRefreshToken(currentRefreshToken);
+    if (!refreshTokenPayload) throw new AuthenticationError('Refresh Token is invalid');
+
+    const { id } = refreshTokenPayload;
+    const { name, email, language } = await User.query().findById(id).withGraphFetched('language');
+
+    const {
+      token: refreshToken, expiresIn: refreshTokenExpiry,
+    } = await generateToken({ id }, TokenType.REFRESH);
+
+    const { token: accessToken } = await generateToken({
+      id, email, name, languageId: language.id,
+    }, TokenType.ACCESS);
+
+    setRefreshToken(res, refreshToken);
+
+    return {
+      accessToken,
+      refreshTokenExpiry,
+    };
+  }
+
+  public static async logout(res: any): Promise<boolean> {
+    removeRefreshToken(res);
+    return true;
   }
 }

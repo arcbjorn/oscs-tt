@@ -5,7 +5,7 @@ export default class AuthContext {
     readonly id?: number,
     readonly email?: string,
     readonly name?: string,
-    readonly language?: number,
+    readonly languageId?: number,
   // eslint-disable-next-line no-empty-function
   ) { }
 
@@ -23,11 +23,11 @@ export default class AuthContext {
     // Validate the JWT token and extract the user data
     const auth = await verifyAccessToken(authToken);
 
-    return new AuthContext(auth?.id, auth?.email, auth?.name, auth?.language);
+    return new AuthContext(auth?.id, auth?.email, auth?.name, auth?.languageId);
   }
 
-  checkLanguage(language: number, error?: string): boolean {
-    const result = this.language === language;
+  checkLanguage(languageId: number, error?: string): boolean {
+    const result = this.languageId === languageId;
 
     if (!result && error) throw new Error(error);
 

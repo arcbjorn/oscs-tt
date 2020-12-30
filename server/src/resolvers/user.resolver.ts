@@ -1,10 +1,15 @@
+/* eslint-disable class-methods-use-this */
+
 import {
   Resolver,
   Query,
   Mutation,
   Args,
   Arg,
+  Ctx,
 } from 'type-graphql';
+import DefaultContext from '../DefaultContext';
+import { AuthResult } from '../auth/AuthResult';
 
 import { User, UserArgs, BaseDto } from '../db';
 import { createUserSamples } from '../samples';
@@ -12,6 +17,32 @@ import { createUserSamples } from '../samples';
 @Resolver(User)
 export class UserResolver {
   private readonly users: User[] = createUserSamples();
+
+  @Mutation(() => AuthResult)
+  async login(
+    @Arg('email') email: string,
+    @Arg('password') password: string,
+    @Ctx() context: DefaultContext,
+  ): Promise<AuthResult> {
+    const result = await User.login(email, password, context.res);
+    return result;
+  }
+
+  @Mutation(() => AuthResult)
+  async refreshAccessToken(
+    @Ctx() context: DefaultContext,
+  ): Promise<AuthResult> {
+    const result = await User.refresh(context);
+    return result;
+  }
+
+  @Mutation(() => Boolean)
+  async logout(
+    @Ctx() context: DefaultContext,
+  ): Promise<Boolean> {
+    const result = await User.logout(context);
+    return result;
+  }
 
   @Query(() => User, { nullable: true })
   async getUser(@Args() { id }: UserArgs): Promise<User> {
@@ -31,7 +62,7 @@ export class UserResolver {
     return users;
   }
 
-  @Mutation(() => [User])
+  @Mutation(() => Number)
   async createUser(@Arg('dto') dto: BaseDto): Promise<Number> {
     const user = Object.assign(new User(), {
       description: dto.description,
