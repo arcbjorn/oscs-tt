@@ -11,7 +11,7 @@ import {
 import DefaultContext from '../DefaultContext';
 import { AuthResult } from '../auth/AuthResult';
 
-import { User, UserArgs, BaseDto } from '../db';
+import { User, UserArgs, UserDto } from '../db';
 import { createUserSamples } from '../samples';
 
 @Resolver(User)
@@ -25,6 +25,15 @@ export class UserResolver {
     @Ctx() context: DefaultContext,
   ): Promise<AuthResult> {
     const result = await User.login(email, password, context.res);
+    return result;
+  }
+
+  @Mutation(() => AuthResult)
+  async register(
+    @Arg('userDto') userDto: UserDto,
+    @Ctx() context: DefaultContext,
+  ): Promise<AuthResult> {
+    const result = await User.register({ ...userDto }, context.res);
     return result;
   }
 
@@ -63,9 +72,9 @@ export class UserResolver {
   }
 
   @Mutation(() => Number)
-  async createUser(@Arg('dto') dto: BaseDto): Promise<Number> {
+  async createUser(@Arg('dto') dto: UserDto): Promise<Number> {
     const user = Object.assign(new User(), {
-      description: dto.description,
+      email: dto.email,
       name: dto.name,
     });
     await this.users.push(user);
