@@ -3,6 +3,7 @@ import { Model } from 'objection';
 
 import dbconfig from './knexfile';
 
+export * from './models/Language';
 export * from './models/User';
 export * from './models/TimeEntry';
 export * from './models/Section';

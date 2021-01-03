@@ -6,6 +6,7 @@ import { ApolloServer } from 'apollo-server';
 import { buildSchema } from 'type-graphql';
 import AuthContext from './auth/AuthContext';
 import {
+  LanguageResolver,
   UserResolver,
   TimeEntryResolver,
   CourseResolver,
@@ -19,6 +20,7 @@ dotenv.config();
 (async () => {
   const schema = await buildSchema({
     resolvers: [
+      LanguageResolver,
       UserResolver,
       TimeEntryResolver,
       CourseResolver,
