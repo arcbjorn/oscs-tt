@@ -1,29 +1,30 @@
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { ApolloProvider } from '@apollo/client';
+import { useQuery } from '@apollo/client';
+import { loader } from 'graphql.macro';
 import './i18n/config';
 
 import Container from '@material-ui/core/Container';
-import client from './apollo';
 
 import SignInAndSignUpPage from './views/SignInAndSignUpPage';
 import LandingPage from './views/LandingPage';
 
+const auth = loader('./gql/queries/auth/AuthData.graphql');
+
 const App: React.FC = () => {
-  const f = false;
+  const { data } = useQuery(auth);
+
   return (
-    <ApolloProvider client={client}>
-      <Container>
-        <Switch>
-          <Route exact path="/" component={LandingPage} />
-          <Route
-            exact
-            path="/signin"
-            render={() => (f === false ? <Redirect to="/" /> : <SignInAndSignUpPage />)}
-          />
-        </Switch>
-      </Container>
-    </ApolloProvider>
+    <Container>
+      <Switch>
+        <Route exact path="/" component={LandingPage} />
+        <Route
+          exact
+          path="/signin"
+          render={() => (data ? <Redirect to="/" /> : <SignInAndSignUpPage />)}
+        />
+      </Switch>
+    </Container>
   );
 };
 

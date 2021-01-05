@@ -1,0 +1,10 @@
+query AuthData {
+  auth: authData @client {
+    id
+    email
+    name
+    accessToken
+    accessTokenExpiry
+    refreshTokenExpiry
+  }
+}
