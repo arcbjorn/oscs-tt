@@ -1,4 +1,6 @@
 import React from 'react';
+import { loader } from 'graphql.macro';
+import { useMutation } from '@apollo/client';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -11,6 +13,8 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+
+const LOGIN = loader('../gql/mutations/auth/Login.gql');
 
 const Copyright: React.FC = () => {
   return (
@@ -57,6 +61,19 @@ const useStyles = makeStyles((theme) => ({
 
 const SignInAndSignUpPage: React.FC = () => {
   const classes = useStyles();
+  const [login] = useMutation(LOGIN);
+  let emailField: any;
+  let passwordField: any;
+
+  const onSubmit = (e: any) => {
+    e.preventDefault();
+    if (!emailField || !passwordField) {
+      return;
+    }
+    login({ variables: { email: emailField.value, password: passwordField.value } });
+    emailField.value = '';
+    passwordField.value = '';
+  };
 
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
@@ -70,7 +87,7 @@ const SignInAndSignUpPage: React.FC = () => {
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            <form className={classes.form} noValidate>
+            <form className={classes.form} noValidate onSubmit={onSubmit}>
               <TextField
                 variant="outlined"
                 margin="normal"
@@ -81,6 +98,9 @@ const SignInAndSignUpPage: React.FC = () => {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                ref={(node) => {
+                  emailField = node;
+                }}
               />
               <TextField
                 variant="outlined"
@@ -92,6 +112,9 @@ const SignInAndSignUpPage: React.FC = () => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                ref={(node) => {
+                  passwordField = node;
+                }}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
