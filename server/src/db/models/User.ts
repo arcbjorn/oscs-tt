@@ -3,7 +3,7 @@ import {
   ArgsType,
   Field, InputType, ObjectType,
 } from 'type-graphql';
-import { AuthenticationError, ValidationError } from 'apollo-server';
+import { AuthenticationError } from 'apollo-server';
 import DefaultContext from '../../DefaultContext';
 import {
   generateToken, getRefreshToken, removeRefreshToken, setRefreshToken, TokenType, verifyRefreshToken,
@@ -82,11 +82,23 @@ export class User extends Model {
       .first()
       .withGraphFetched('language');
 
-    if (!user) throw new AuthenticationError('Refresh Token is invalid');
+    if (!user) {
+      return new AuthResult({
+        accessToken: '',
+        refreshTokenExpiry: 0,
+        error: 'user-not-found',
+      });
+    }
 
     const match = await user.checkSecret(password);
 
-    if (!match) throw new AuthenticationError('Wrong password');
+    if (!match) {
+      return new AuthResult({
+        accessToken: '',
+        refreshTokenExpiry: 0,
+        error: 'wrong-password',
+      });
+    }
 
     const { id, name, language } = user;
 
@@ -100,10 +112,10 @@ export class User extends Model {
 
     setRefreshToken(res, refreshToken);
 
-    return {
+    return new AuthResult({
       accessToken,
       refreshTokenExpiry,
-    };
+    });
   }
 
   public static async register(userDto: UserDto, res: any): Promise<AuthResult> {
@@ -112,7 +124,11 @@ export class User extends Model {
     } = userDto;
 
     if (Object.values(userDto).some((val) => !val)) {
-      throw new ValidationError('Missing user info to register');
+      return new AuthResult({
+        accessToken: '',
+        refreshTokenExpiry: 0,
+        error: 'incomplete-register-user-data',
+      });
     }
 
     const existingUser = await User
@@ -120,9 +136,21 @@ export class User extends Model {
       .where('email', '=', email!)
       .first();
 
-    if (existingUser) throw new AuthenticationError('This email is already used');
-    if (password !== confirmPassword) throw new ValidationError('Confirmed password does not match');
+    if (existingUser) {
+      return new AuthResult({
+        accessToken: '',
+        refreshTokenExpiry: 0,
+        error: 'email-already-used',
+      });
+    }
 
+    if (password !== confirmPassword) {
+      return new AuthResult({
+        accessToken: '',
+        refreshTokenExpiry: 0,
+        error: 'invalid-confirmed-password',
+      });
+    }
     const secret = await generateSecret(password!, +process.env.AUTH_SALT_ROUNDS!);
 
     const { id } = await User.query().upsertGraph({
@@ -142,17 +170,17 @@ export class User extends Model {
 
     setRefreshToken(res, refreshToken);
 
-    return {
+    return new AuthResult({
       accessToken,
       refreshTokenExpiry,
-    };
+    });
   }
 
   public static async refresh({ req, res }: DefaultContext): Promise<AuthResult> {
     const currentRefreshToken = getRefreshToken(req);
 
     const refreshTokenPayload = await verifyRefreshToken(currentRefreshToken);
-    if (!refreshTokenPayload) throw new AuthenticationError('Refresh Token is invalid');
+    if (!refreshTokenPayload) throw new AuthenticationError('invalid-refresh-token');
 
     const { id } = refreshTokenPayload;
     const { name, email, language } = await User.query().findById(id).withGraphFetched('language');
@@ -167,10 +195,10 @@ export class User extends Model {
 
     setRefreshToken(res, refreshToken);
 
-    return {
+    return new AuthResult({
       accessToken,
       refreshTokenExpiry,
-    };
+    });
   }
 
   public static async logout(res: any): Promise<boolean> {

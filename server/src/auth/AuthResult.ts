@@ -2,6 +2,10 @@ import { Field, ObjectType } from 'type-graphql';
 
 @ObjectType({ description: 'Result of an authorisation operation' })
 export class AuthResult {
+  constructor(init?:Partial<AuthResult>) {
+    Object.assign(this, init);
+  }
+
   @Field({ description: 'JWT token for authentification' })
   accessToken!: string;
 
