@@ -6,8 +6,8 @@ import './i18n/config';
 import Container from '@material-ui/core/Container';
 import client from './apollo';
 
-import SignInAndSignUpPage from './pages/SignInAndSignUpPage';
-import LandingPage from './pages/LandingPage';
+import SignInAndSignUpPage from './views/SignInAndSignUpPage';
+import LandingPage from './views/LandingPage';
 
 const App: React.FC = () => {
   const f = false;
