@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { loader } from 'graphql.macro';
 import { useMutation } from '@apollo/client';
 import Avatar from '@material-ui/core/Avatar';
@@ -61,18 +61,22 @@ const useStyles = makeStyles((theme) => ({
 
 const SignInAndSignUpPage: React.FC = () => {
   const classes = useStyles();
-  const [login] = useMutation(LOGIN);
-  let emailField: any;
-  let passwordField: any;
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [login, { error, data }] = useMutation<
+    { login: { email: string; password: string } },
+    { email: string; password: string }
+  >(LOGIN, {
+    variables: { email, password },
+  });
 
   const onSubmit = (e: any) => {
     e.preventDefault();
-    if (!emailField || !passwordField) {
+    if (!email || !password) {
       return;
     }
-    login({ variables: { email: emailField.value, password: passwordField.value } });
-    emailField.value = '';
-    passwordField.value = '';
+    login();
   };
 
   return (
@@ -98,9 +102,7 @@ const SignInAndSignUpPage: React.FC = () => {
                 name="email"
                 autoComplete="email"
                 autoFocus
-                ref={(node) => {
-                  emailField = node;
-                }}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
                 variant="outlined"
@@ -112,9 +114,7 @@ const SignInAndSignUpPage: React.FC = () => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                ref={(node) => {
-                  passwordField = node;
-                }}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
