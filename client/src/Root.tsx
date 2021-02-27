@@ -5,12 +5,10 @@ import { useQuery } from '@apollo/client';
 import { loader } from 'graphql.macro';
 import './i18n/config';
 
-import type { AuthDataQuery, AuthDataQueryVariables } from './gql/types';
-
 const SignInAndSignUpPage = lazy(() => import('./views/SignInAndSignUpPage'));
 const LandingPage = lazy(() => import('./views/LandingPage'));
 
-const AUTH = loader('./gql/queries/auth/AuthData.graphql');
+const AUTH = loader('./gql/queries/auth/AuthData.gql');
 
 const Root: React.FC = () => {
   const { data, error } = useQuery(AUTH);
