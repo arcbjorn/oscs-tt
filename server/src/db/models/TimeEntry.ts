@@ -89,7 +89,7 @@ export class TimeEntry extends BaseModel {
   public static async create(dto: TimeEntryDto, args: TimeEntryArgs): Promise<number> {
     try {
       if (typeof args.sourceId === 'undefined') {
-        throw new NotFoundError('Time Entry source ID is missing.');
+        throw new NotFoundError({ message: 'Time Entry source ID is missing.' });
       }
 
       let source: string;
@@ -123,7 +123,7 @@ export class TimeEntry extends BaseModel {
   public static async get(args: TimeEntryArgs): Promise<TimeEntry> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Time Entry ID is missing.');
+        throw new NotFoundError({ message: 'Time Entry ID is missing.' });
       }
 
       const timeEntry = await TimeEntry
@@ -140,7 +140,7 @@ export class TimeEntry extends BaseModel {
   public static async update(dto: TimeEntryDto, args: TimeEntryArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Time Entry ID is missing.');
+        throw new NotFoundError({ message: 'Time Entry ID is missing.' });
       }
 
       await TimeEntry
@@ -158,7 +158,7 @@ export class TimeEntry extends BaseModel {
   public static async delete(args: TimeEntryArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Time Entry ID is missing.');
+        throw new NotFoundError({ message: 'Time Entry ID is missing.' });
       }
 
       await TimeEntry

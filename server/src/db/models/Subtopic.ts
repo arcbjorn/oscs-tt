@@ -152,7 +152,7 @@ export class Subtopic extends BaseModel {
   public static async update(dto: BaseDto, args: SubtopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Subtopic ID is missing.');
+        throw new NotFoundError({ message: 'Subtopic ID is missing.' });
       }
 
       await Subtopic
@@ -170,7 +170,7 @@ export class Subtopic extends BaseModel {
   public static async delete(args: SubtopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Subtopic ID is missing.');
+        throw new NotFoundError({ message: 'Subtopic ID is missing.' });
       }
 
       await Subtopic

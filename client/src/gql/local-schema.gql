@@ -1,0 +1,14 @@
+scalar DateTime
+
+type AuthData {
+  id: ID
+  email: String
+  name: String
+  accessToken: String
+  accessTokenExpiry: DateTime
+  refreshTokenExpiry: DateTime
+}
+
+extend type Query {
+  authData: AuthData!
+}

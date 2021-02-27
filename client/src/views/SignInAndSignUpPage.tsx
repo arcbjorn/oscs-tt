@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { FormEvent, useState } from 'react';
+// Comment for updating cache
 import { loader } from 'graphql.macro';
 import { useMutation } from '@apollo/client';
 import Avatar from '@material-ui/core/Avatar';
@@ -13,6 +14,8 @@ import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
+
+import { LoginMutation, LoginMutationVariables } from '../gql/types';
 
 const LOGIN = loader('../gql/mutations/auth/Login.gql');
 
@@ -64,19 +67,14 @@ const SignInAndSignUpPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const [login, { error, data }] = useMutation<
-    { login: { email: string; password: string } },
-    { email: string; password: string }
-  >(LOGIN, {
+  const [login, { error, data }] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN, {
     variables: { email, password },
   });
 
-  const onSubmit = (e: any) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!email || !password) {
-      return;
-    }
-    login();
+    if (!email || !password) return;
+    await login();
   };
 
   return (

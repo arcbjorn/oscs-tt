@@ -93,7 +93,7 @@ export class Section extends BaseModel {
   public static async get(args: SectionArgs): Promise<Section> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Section ID is missing.');
+        throw new NotFoundError({ message: 'Section ID is missing.' });
       }
 
       const section = await Section
@@ -113,7 +113,7 @@ export class Section extends BaseModel {
   public static async update(dto: BaseDto, args: SectionArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Section ID is missing.');
+        throw new NotFoundError({ message: 'Section ID is missing.' });
       }
 
       await Section
@@ -131,7 +131,7 @@ export class Section extends BaseModel {
   public static async delete(args: SectionArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Section ID is missing.');
+        throw new NotFoundError({ message: 'Section ID is missing.' });
       }
 
       await Section

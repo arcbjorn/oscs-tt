@@ -10,7 +10,7 @@ import { Language, LanguageDto } from '../db';
 @Resolver(Language)
 export class LanguageResolver {
   @Mutation(() => Number)
-  async createLanguage(@Arg('dto') dto: LanguageDto): Promise<Number> {
+  async createLanguage(@Arg('dto') dto: LanguageDto): Promise<number> {
     const { id } = await Language.query().insert({
       name: dto.name,
       code: dto.code,

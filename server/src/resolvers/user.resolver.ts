@@ -16,7 +16,7 @@ import { createUserSamples } from '../samples';
 
 @Resolver(User)
 export class UserResolver {
-  private readonly users: User[] = createUserSamples();
+  private readonly userList: User[] = createUserSamples();
 
   @Mutation(() => AuthResult)
   async login(
@@ -49,13 +49,13 @@ export class UserResolver {
   async logout(
     @Ctx() context: DefaultContext,
   ): Promise<Boolean> {
-    const result = await User.logout(context);
+    const result = await User.logout(context.res);
     return result;
   }
 
   @Query(() => User, { nullable: true })
-  async getUser(@Args() { id }: UserArgs): Promise<User> {
-    const entry = await this.users.find((user) => user.id === id);
+  async user(@Args() { id }: UserArgs): Promise<User> {
+    const entry = await this.userList.find((user) => user.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -63,12 +63,12 @@ export class UserResolver {
   }
 
   @Query(() => [User])
-  async getUsers(): Promise<User[]> {
-    const users = await this.users;
-    if (users === undefined) {
+  async users(): Promise<User[]> {
+    const userList = await this.userList;
+    if (userList === undefined) {
       throw new Error();
     }
-    return users;
+    return userList;
   }
 
   @Mutation(() => Number)
@@ -77,7 +77,7 @@ export class UserResolver {
       email: dto.email,
       name: dto.name,
     });
-    await this.users.push(user);
+    await this.userList.push(user);
     if (user === undefined) {
       throw new Error();
     }

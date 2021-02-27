@@ -16,9 +16,6 @@ import { Language } from './Language';
 @InputType()
 export class UserDto implements Partial<User> {
   @Field({ nullable: true })
-  id?: number;
-
-  @Field({ nullable: true })
   name?: string;
 
   @Field({ nullable: true })
@@ -75,7 +72,11 @@ export class User extends Model {
     return checkSecret(password, this.secret);
   }
 
-  public static async login(email: string, password: string, res: any): Promise<AuthResult> {
+  public static async login(
+    email: string,
+    password: string,
+    res: any,
+  ): Promise<AuthResult> {
     const user = await User
       .query()
       .where('email', '=', email)

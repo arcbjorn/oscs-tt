@@ -91,7 +91,7 @@ export class Specialty extends BaseModel {
   public static async get(args: SpecialtyArgs): Promise<Specialty> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Specialty ID is missing.');
+        throw new NotFoundError({ message: 'Specialty ID is missing.' });
       }
 
       const specialty = await Specialty
@@ -126,7 +126,7 @@ export class Specialty extends BaseModel {
   public static async update(dto: BaseDto, args: SpecialtyArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Specialty ID is missing.');
+        throw new NotFoundError({ message: 'Specialty ID is missing.' });
       }
 
       await Specialty
@@ -144,7 +144,7 @@ export class Specialty extends BaseModel {
   public static async delete(args: SpecialtyArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Specialty ID is missing.');
+        throw new NotFoundError({ message: 'Specialty ID is missing.' });
       }
 
       await Specialty

@@ -1,0 +1,7 @@
+mutation register($userDto: UserDto!) {
+  register(userDto: $userDto) {
+    accessToken
+    refreshTokenExpiry
+    error
+  }
+}

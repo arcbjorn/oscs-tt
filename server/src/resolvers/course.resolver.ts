@@ -11,11 +11,11 @@ import { createCourseSamples } from '../samples';
 
 @Resolver(Course)
 export class CourseResolver {
-  private readonly courses: Course[] = createCourseSamples();
+  private readonly coursesList: Course[] = createCourseSamples();
 
   @Query(() => Course, { nullable: true })
-  async getCourse(@Args() { id }: CourseArgs) {
-    const entry = await this.courses.find((course) => course.id === id);
+  async course(@Args() { id }: CourseArgs): Promise<Course> {
+    const entry = await this.coursesList.find((course) => course.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -23,24 +23,24 @@ export class CourseResolver {
   }
 
   @Query(() => [Course])
-  async getCourses() {
-    const courses = await this.courses;
-    if (courses === undefined) {
+  async courses(): Promise<Course[]> {
+    const coursesList = await this.coursesList;
+    if (coursesList === undefined) {
       throw new Error();
     }
-    return courses;
+    return coursesList;
   }
 
   @Mutation(() => [Course])
-  async createCourse(@Arg('dto') dto: CourseDto) {
+  async createCourse(@Arg('dto') dto: CourseDto): Promise<number> {
     const course = Object.assign(new Course(), {
       description: dto.description,
       name: dto.name,
     });
-    await this.courses.push(course);
+    await this.coursesList.push(course);
     if (course === undefined) {
       throw new Error();
     }
-    return course;
+    return course.id;
   }
 }

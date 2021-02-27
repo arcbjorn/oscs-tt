@@ -10,11 +10,11 @@ import { BaseDto, Subtopic, SubtopicArgs } from '../db';
 
 @Resolver(Subtopic)
 export class SubtopicResolver {
-  private readonly subtopics: Subtopic[] = [];
+  private readonly subtopicList: Subtopic[] = [];
 
   @Query(() => Subtopic, { nullable: true })
-  async getSubtopic(@Args() { id }: SubtopicArgs) {
-    const entry = await this.subtopics.find((subtopic) => subtopic.id === id);
+  async subtopic(@Args() { id }: SubtopicArgs): Promise<Subtopic> {
+    const entry = await this.subtopicList.find((subtopic) => subtopic.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -22,24 +22,24 @@ export class SubtopicResolver {
   }
 
   @Query(() => [Subtopic])
-  async getSubtopics() {
-    const subtopics = await this.subtopics;
-    if (subtopics === undefined) {
+  async subtopics(): Promise<Subtopic[]> {
+    const subtopicList = await this.subtopicList;
+    if (subtopicList === undefined) {
       throw new Error();
     }
-    return subtopics;
+    return subtopicList;
   }
 
   @Mutation(() => [Subtopic])
-  async createSubtopic(@Arg('dto') dto: BaseDto) {
+  async createSubtopic(@Arg('dto') dto: BaseDto): Promise<number> {
     const subtopic = Object.assign(new Subtopic(), {
       description: dto.description,
       name: dto.name,
     });
-    await this.subtopics.push(subtopic);
+    await this.subtopicList.push(subtopic);
     if (subtopic === undefined) {
       throw new Error();
     }
-    return subtopic;
+    return subtopic.id;
   }
 }

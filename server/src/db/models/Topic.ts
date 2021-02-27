@@ -78,7 +78,7 @@ export class Topic extends BaseModel {
   public static async get(args: TopicArgs): Promise<Topic> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Topic ID is missing.');
+        throw new NotFoundError({ message: 'Topic ID is missing.' });
       }
 
       const topic = await Topic
@@ -113,7 +113,7 @@ export class Topic extends BaseModel {
   public static async update(dto: BaseDto, args: TopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Topic ID is missing.');
+        throw new NotFoundError({ message: 'Topic ID is missing.' });
       }
 
       await Topic
@@ -131,7 +131,7 @@ export class Topic extends BaseModel {
   public static async delete(args: TopicArgs): Promise<boolean> {
     try {
       if (typeof args.id === 'undefined') {
-        throw new NotFoundError('Topic ID is missing.');
+        throw new NotFoundError({ message: 'Topic ID is missing.' });
       }
 
       await Topic

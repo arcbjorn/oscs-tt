@@ -11,11 +11,11 @@ import { createTopicSamples } from '../samples';
 
 @Resolver(Topic)
 export class TopicResolver {
-  private readonly topics: Topic[] = createTopicSamples();
+  private readonly topicList: Topic[] = createTopicSamples();
 
   @Query(() => Topic, { nullable: true })
-  async getTopic(@Args() { id }: TopicArgs): Promise<Topic> {
-    const entry = await this.topics.find((topic) => topic.id === id);
+  async topic(@Args() { id }: TopicArgs): Promise<Topic> {
+    const entry = await this.topicList.find((topic) => topic.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -23,21 +23,21 @@ export class TopicResolver {
   }
 
   @Query(() => [Topic])
-  async getTopics(): Promise<Topic[]> {
-    const topics = await this.topics;
-    if (topics === undefined) {
+  async topics(): Promise<Topic[]> {
+    const topicList = await this.topicList;
+    if (topicList === undefined) {
       throw new Error();
     }
-    return topics;
+    return topicList;
   }
 
   @Mutation(() => [Topic])
-  async createTopic(@Arg('dto') dto: BaseDto): Promise<Number> {
+  async createTopic(@Arg('dto') dto: BaseDto): Promise<number> {
     const topic = Object.assign(new Topic(), {
       description: dto.description,
       name: dto.name,
     });
-    await this.topics.push(topic);
+    await this.topicList.push(topic);
     if (topic === undefined) {
       throw new Error();
     }

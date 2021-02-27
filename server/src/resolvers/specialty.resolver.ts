@@ -12,11 +12,11 @@ import {
 
 @Resolver(Specialty)
 export class SpecialtyResolver {
-  private readonly specialties: Specialty[] = [];
+  private readonly specialtyList: Specialty[] = [];
 
   @Query(() => Specialty, { nullable: true })
-  async getSpecialty(@Args() { id }: SpecialtyArgs) {
-    const entry = await this.specialties.find((specialty) => specialty.id === id);
+  async specialty(@Args() { id }: SpecialtyArgs): Promise<Specialty> {
+    const entry = await this.specialtyList.find((specialty) => specialty.id === id);
     if (entry === undefined) {
       throw new Error();
     }
@@ -24,24 +24,24 @@ export class SpecialtyResolver {
   }
 
   @Query(() => [Specialty])
-  async getSpecialtys() {
-    const specialties = await this.specialties;
-    if (specialties === undefined) {
+  async specialties(): Promise<Specialty[]> {
+    const specialtyList = await this.specialtyList;
+    if (specialtyList === undefined) {
       throw new Error();
     }
-    return specialties;
+    return specialtyList;
   }
 
   @Mutation(() => Specialty)
-  async createSpecialty(@Arg('dto') dto: BaseDto) {
+  async createSpecialty(@Arg('dto') dto: BaseDto): Promise<number> {
     const specialty = Object.assign(new Specialty(), {
       description: dto.description,
       name: dto.name,
     });
-    await this.specialties.push(specialty);
+    await this.specialtyList.push(specialty);
     if (specialty === undefined) {
       throw new Error();
     }
-    return specialty;
+    return specialty.id;
   }
 }

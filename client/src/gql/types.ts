@@ -15,23 +15,40 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
-  getUser?: Maybe<User>;
-  getUsers: Array<User>;
-  timeEntry?: Maybe<TimeEntry>;
+  authData: AuthData;
+  course?: Maybe<Course>;
+  courses: Array<Course>;
+  specialties: Array<Specialty>;
+  specialty?: Maybe<Specialty>;
+  subtopic?: Maybe<Subtopic>;
+  subtopics: Array<Subtopic>;
   timeEntries: Array<TimeEntry>;
-  getCourse?: Maybe<Course>;
-  getCourses: Array<Course>;
-  getSpecialty?: Maybe<Specialty>;
-  getSpecialtys: Array<Specialty>;
-  getSubtopic?: Maybe<Subtopic>;
-  getSubtopics: Array<Subtopic>;
-  getTopic?: Maybe<Topic>;
-  getTopics: Array<Topic>;
+  timeEntry?: Maybe<TimeEntry>;
+  topic?: Maybe<Topic>;
+  topics: Array<Topic>;
+  user?: Maybe<User>;
+  users: Array<User>;
 };
 
 
-export type QueryGetUserArgs = {
+export type QueryCourseArgs = {
   id: Scalars['Float'];
+  authCtxId?: Maybe<Scalars['Float']>;
+  sourceId?: Maybe<Scalars['Float']>;
+};
+
+
+export type QuerySpecialtyArgs = {
+  id: Scalars['Float'];
+  authCtxId?: Maybe<Scalars['Float']>;
+  subtopicId?: Maybe<Scalars['Float']>;
+};
+
+
+export type QuerySubtopicArgs = {
+  id: Scalars['Float'];
+  authCtxId?: Maybe<Scalars['Float']>;
+  topicId?: Maybe<Scalars['Float']>;
 };
 
 
@@ -42,30 +59,14 @@ export type QueryTimeEntryArgs = {
 };
 
 
-export type QueryGetCourseArgs = {
+export type QueryTopicArgs = {
   id: Scalars['Float'];
   authCtxId?: Maybe<Scalars['Float']>;
-  sourceId?: Maybe<Scalars['Float']>;
 };
 
 
-export type QueryGetSpecialtyArgs = {
+export type QueryUserArgs = {
   id: Scalars['Float'];
-  authCtxId?: Maybe<Scalars['Float']>;
-  subtopicId?: Maybe<Scalars['Float']>;
-};
-
-
-export type QueryGetSubtopicArgs = {
-  id: Scalars['Float'];
-  authCtxId?: Maybe<Scalars['Float']>;
-  topicId?: Maybe<Scalars['Float']>;
-};
-
-
-export type QueryGetTopicArgs = {
-  id: Scalars['Float'];
-  authCtxId?: Maybe<Scalars['Float']>;
 };
 
 /** OSCSTT User */
@@ -278,7 +279,6 @@ export type AuthResult = {
 };
 
 export type UserDto = {
-  id?: Maybe<Scalars['Float']>;
   name?: Maybe<Scalars['String']>;
   email?: Maybe<Scalars['String']>;
   languageId?: Maybe<Scalars['Float']>;
@@ -309,6 +309,16 @@ export type BaseDto = {
   ownerId?: Maybe<Scalars['Float']>;
 };
 
+export type AuthData = {
+  __typename?: 'AuthData';
+  id?: Maybe<Scalars['ID']>;
+  email?: Maybe<Scalars['String']>;
+  name?: Maybe<Scalars['String']>;
+  accessToken?: Maybe<Scalars['String']>;
+  accessTokenExpiry?: Maybe<Scalars['DateTime']>;
+  refreshTokenExpiry?: Maybe<Scalars['DateTime']>;
+};
+
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
@@ -337,6 +347,19 @@ export type RefreshAccessTokenMutationVariables = Exact<{ [key: string]: never; 
 export type RefreshAccessTokenMutation = (
   { __typename?: 'Mutation' }
   & { refreshAccessToken: (
+    { __typename?: 'AuthResult' }
+    & Pick<AuthResult, 'accessToken' | 'refreshTokenExpiry' | 'error'>
+  ) }
+);
+
+export type RegisterMutationVariables = Exact<{
+  userDto: UserDto;
+}>;
+
+
+export type RegisterMutation = (
+  { __typename?: 'Mutation' }
+  & { register: (
     { __typename?: 'AuthResult' }
     & Pick<AuthResult, 'accessToken' | 'refreshTokenExpiry' | 'error'>
   ) }
